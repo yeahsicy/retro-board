@@ -1,0 +1,25 @@
+{
+  "variables": {
+    "api_access_key": "{{ env `scaleway_api_access_key`}}",
+    "api_token": "{{ env `scaleway_api_token`}}"
+  },
+  "builders": [
+    {
+      "type": "scaleway",
+      "organization_id": "{{ user `api_access_key` }}",
+      "api_token": "{{ user `api_token` }}",
+      "image": "f974feac-abae-4365-b988-8ec7d1cec10d",
+      "region": "par1",
+      "commercial_type": "DEV1-S",
+      "server_name": "retrospected_beta",
+      "ssh_username": "antoine",
+      "ssh_private_key_file": "/Users/antoine/.ssh/retro"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": ["sleep 30", "apt-get update", "apt-get -y upgrade"]
+    }
+  ]
+}
