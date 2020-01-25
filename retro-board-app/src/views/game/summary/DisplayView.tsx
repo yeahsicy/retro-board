@@ -1,29 +1,16 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import {
   Typography,
-  Card,
-  CardHeader,
-  CardContent,
   Grid,
-  useTheme,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Avatar,
 } from '@material-ui/core';
-import { Feedback } from '@material-ui/icons';
 import { ColumnContent } from '../types';
 import { Palette } from '../../../Theme';
 import useTranslations from '../../../translations';
 import { Post } from 'retro-board-common';
 import { countVotes, sortPostByVote } from '../utils';
-import { Page } from '../../../components/Page';
-import SpeedDial from './SpeedDial';
-import DisplayView from './DisplayView';
 
-interface SummaryModeProps {
+interface DisplayViewProps {
   columns: ColumnContent[];
 }
 
@@ -34,23 +21,12 @@ interface SectionProps {
 const Section = ({ column }: SectionProps) => (
   <Grid container spacing={4} component="section" role="list">
     <Grid item xs={12}>
-      <Card>
-        <CardHeader
-          title={
-            <Typography variant="h6" style={{ fontWeight: 300 }}>
-              {column.label}
-            </Typography>
-          }
-          style={{ backgroundColor: column.color }}
-        />
-        <CardContent>
-          {column.posts.length ? (
-            <PostsList posts={column.posts} />
-          ) : (
-              <Typography variant="body1">No posts in this category.</Typography>
-            )}
-        </CardContent>
-      </Card>
+      <h1>{column.label}</h1>
+      {column.posts.length ? (
+        <PostsList posts={column.posts} />
+      ) : (
+          <Typography variant="body1">No posts in this category.</Typography>
+        )}
     </Grid>
   </Grid>
 );
@@ -85,7 +61,7 @@ const PostLine = ({ post }: PostLineProps) => {
         <Score>
           <PositiveNumber>+{likes}</PositiveNumber>&nbsp;
           <NegativeNumber>-{dislikes}</NegativeNumber>
-        </Score>
+        </Score>&nbsp;&nbsp;
         <PostContent aria-label="post content">{post.content}</PostContent>
       </PostContainer>
     </Typography>
@@ -93,11 +69,15 @@ const PostLine = ({ post }: PostLineProps) => {
 };
 
 const PostContainer = styled.div`
-  display: flex;
+  display: inline-block;
+  color: black;
 `;
 
 const Score = styled.div`
   margin-right: 10px;
+  border: 2px solid red;
+  max-width: 100px;
+  display: inline-block;
 `;
 
 const PositiveNumber = styled.span`
@@ -109,12 +89,12 @@ const NegativeNumber = styled.span`
 `;
 
 const PostContent = styled.span`
+border: 2px solid blue;
   white-space: pre-wrap;
-  flex: 1;
+  display: inline-block;
 `;
 
 const ActionsList = ({ posts }: PostsListProps) => {
-  const theme = useTheme();
   const {
     Actions: { summaryTitle },
   } = useTranslations();
@@ -127,71 +107,36 @@ const ActionsList = ({ posts }: PostsListProps) => {
       style={{ marginTop: 30 }}
     >
       <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title={
-              <Typography variant="h6" style={{ fontWeight: 300 }}>
-                {summaryTitle}
-              </Typography>
-            }
-            style={{
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
-            }}
-          />
-          <CardContent>
-            <List>
-              {posts.map(post => (
-                <ListItem key={post.id}>
-                  <ListItemIcon>
-                    <Avatar>
-                      <Feedback />
-                    </Avatar>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={post.action}
-                    secondary={post.content}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </CardContent>
-        </Card>
+        <h1>{summaryTitle}</h1>
+        <dl>
+          {posts.map(post => (
+            <React.Fragment key={post.id}>
+              <dt>{post.action}</dt>
+              <dd>{post.content}</dd>
+            </React.Fragment>
+          ))}
+        </dl>
       </Grid>
     </Grid>
   );
 };
 
-const SummaryMode: React.SFC<SummaryModeProps> = ({ columns }) => {
+const DisplayView: React.SFC<DisplayViewProps> = ({ columns }) => {
   const posts = useMemo(() => {
     return columns.reduce<Post[]>((prev, current) => {
       return [...prev, ...current.posts.filter(post => !!post.action)];
     }, []);
   }, [columns]);
-  const htmlVersionRef = useRef<HTMLDivElement>(null);
   return (
-    <Page>
+    <div>
       <div>
         {columns.map(column => (
           <Section key={column.index} column={column} />
         ))}
         {posts.length ? <ActionsList posts={posts} /> : null}
       </div>
-      <SpeedDialContainer>
-        <SpeedDial htmlRef={htmlVersionRef} />
-      </SpeedDialContainer>
-
-      <div ref={htmlVersionRef}>
-        <DisplayView columns={columns} />
-      </div>
-    </Page>
+    </div>
   );
 };
 
-const SpeedDialContainer = styled.div`
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-`;
-
-export default SummaryMode;
+export default DisplayView;

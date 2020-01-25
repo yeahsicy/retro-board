@@ -3,14 +3,18 @@ import styled from 'styled-components';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
-import { AssignmentReturned } from '@material-ui/icons';
+import { AssignmentReturned, Code } from '@material-ui/icons';
 import { SvgIcon } from '@material-ui/core';
 import useMarkdown from './useMarkdown';
 import ReactMarkdown from 'react-markdown';
 import Message from '../../../components/Message';
 import useTranslations from '../../../translations';
 
-const CopySpeedDial = () => {
+interface CopySpeedDialProps {
+  htmlRef: React.RefObject<HTMLDivElement>;
+}
+
+const CopySpeedDial = ({ htmlRef }: CopySpeedDialProps) => {
   const isSupported = !!window.getSelection;
   const { SummaryBoard } = useTranslations();
   const [open, setOpen] = useState(false);
@@ -37,6 +41,12 @@ const CopySpeedDial = () => {
     setMessage(SummaryBoard.copySuccessful!);
   }, [SummaryBoard.copySuccessful]);
 
+  const handleCopyHtml = useCallback(() => {
+    copyToClipboard(htmlRef.current!);
+    setOpen(false);
+    setMessage(SummaryBoard.copySuccessful!);
+  }, [htmlRef, SummaryBoard.copySuccessful]);
+
   return isSupported ? (
     <>
       <SpeedDial
@@ -59,6 +69,11 @@ const CopySpeedDial = () => {
           tooltipTitle={SummaryBoard.copyAsMarkdown!}
           onClick={handleCopyToMarkdown}
         />
+        <SpeedDialAction
+          icon={<Code />}
+          tooltipTitle={SummaryBoard.copyAsMarkdown!}
+          onClick={handleCopyHtml}
+        />
       </SpeedDial>
       <Message
         message={message}
@@ -78,7 +93,7 @@ function copyToClipboard(content: HTMLElement) {
   const container = document.createElement('div');
   container.style.height = '0px';
   container.setAttribute('contenteditable', 'true');
-  container.appendChild(content);
+  container.appendChild(content.cloneNode(true));
   document.body.appendChild(container);
   const selection = window.getSelection();
   const range = document.createRange();
