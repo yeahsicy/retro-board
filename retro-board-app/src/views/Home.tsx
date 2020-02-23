@@ -23,6 +23,10 @@ import { trackEvent } from './../track';
 import { createCustomGame } from '../api';
 import { Page } from '../components/Page';
 import usePreviousSessions from '../hooks/usePreviousSessions';
+import OAuth from '../auth/OAuth';
+import io from 'socket.io-client';
+
+const socket = io();
 
 const useStyles = makeStyles({
   media: {
@@ -68,6 +72,16 @@ function Home() {
     trackEvent('home/create/default');
     history.push('/game/' + shortid());
   }, [history]);
+
+  const handleCallApi = useCallback(() => {
+    async function call() {
+      const resp = await fetch('/api/me');
+      if (resp.ok) {
+        console.log('Response: ', await resp.json());
+      }
+    }
+    call();
+  }, []);
   return (
     <Page>
       <MainCard>
@@ -107,6 +121,13 @@ function Home() {
             onLaunch={createSession}
           />
         </CardActions>
+      </MainCard>
+      <MainCard>
+        <CardContent>
+          <h4>Auth</h4>
+          <OAuth provider="github" socket={socket} />
+          <button onClick={handleCallApi}>Call</button>
+        </CardContent>
       </MainCard>
       {hasPreviousSessions && (
         <MainCard>

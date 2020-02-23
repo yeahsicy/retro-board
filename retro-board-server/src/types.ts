@@ -8,21 +8,26 @@ import {
 } from 'retro-board-common';
 
 export interface Store {
-  get: (key: string) => Promise<Session>;
+  get: (user: User, key: string) => Promise<Session>;
   create: (
     id: string,
     options: SessionOptions,
     columns: ColumnDefinition[]
   ) => Promise<void>;
-  saveSession: (session: Session) => Promise<void>;
-  saveUser: (user: User) => Promise<void>;
-  savePost: (sessionId: string, post: Post) => Promise<void>;
-  saveVote: (sessionId: string, postId: string, vote: Vote) => Promise<void>;
-  deletePost: (sessionId: string, postId: string) => Promise<void>;
+  saveSession: (user: User, session: Session) => Promise<void>;
+  // saveUser: (user: User) => Promise<void>;
+  getOrSaveUser: (user: User) => Promise<User>;
+  savePost: (user: User, sessionId: string, post: Post) => Promise<void>;
+  saveVote: (
+    user: User,
+    sessionId: string,
+    postId: string,
+    vote: Vote
+  ) => Promise<void>;
+  deletePost: (user: User, sessionId: string, postId: string) => Promise<void>;
 }
 
 export interface Configuration {
-  DB_TYPE: 'postgres' | 'nedb';
   DB_NAME: string;
   DB_USER: string;
   DB_PASSWORD: string;

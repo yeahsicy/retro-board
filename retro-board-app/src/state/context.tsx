@@ -9,8 +9,8 @@ import { State, Action } from './types';
 import reducer from './reducer';
 import {
   togglePanel,
-  login,
-  logout,
+  // login,
+  // logout,
   setPlayers,
   receivePost,
   deletePost,
@@ -24,7 +24,6 @@ import { defaultSession } from 'retro-board-common';
 
 export const initialState: State = {
   panelOpen: false,
-  user: null,
   players: [],
   session: {
     ...defaultSession,
@@ -33,7 +32,7 @@ export const initialState: State = {
 
 const Context = createContext({
   state: initialState,
-  dispatch: (_: Action) => {},
+  dispatch: (_: Action) => { },
 });
 
 interface ProviderProps {
@@ -54,8 +53,8 @@ export function useGlobalState() {
   const actions = useMemo(() => {
     return {
       togglePanel: togglePanel(dispatch),
-      login: login(dispatch),
-      logout: logout(dispatch),
+      // login: login(dispatch),
+      // logout: logout(dispatch),
       setPlayers: setPlayers(dispatch),
       receivePost: receivePost(dispatch),
       deletePost: deletePost(dispatch),

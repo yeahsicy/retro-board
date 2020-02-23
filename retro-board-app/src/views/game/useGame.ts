@@ -6,6 +6,7 @@ import { trackAction, trackEvent } from './../../track';
 import io from 'socket.io-client';
 import useGlobalState from '../../state';
 import usePreviousSessions from '../../hooks/usePreviousSessions';
+import useUser from '../../auth/useUser';
 
 const debug = process.env.NODE_ENV === 'development';
 
@@ -14,7 +15,7 @@ function sendFactory(
   user: User,
   sessionId: string
 ) {
-  return function(action: string, payload?: any) {
+  return function (action: string, payload?: any) {
     if (socket && user) {
       socket.emit(action, {
         sessionId: sessionId,
@@ -44,7 +45,8 @@ const useGame = (sessionId: string) => {
     resetSession,
   } = useGlobalState();
 
-  const { user, session } = state;
+  const { session } = state;
+  const user = useUser();
 
   const name = session ? session.name : '';
   const allowMultipleVotes = session ? session.allowMultipleVotes : false;
@@ -77,7 +79,9 @@ const useGame = (sessionId: string) => {
     if (debug) {
       console.log('Initialising Game socket');
     }
-    const newSocket = io();
+    const newSocket = io({
+      query: { token: 'foo ' }
+    });
     resetSession();
     setSocket(newSocket);
 
@@ -97,7 +101,7 @@ const useGame = (sessionId: string) => {
         console.log('Connected to the socket');
       }
       setInitialised(true);
-      send(Actions.LOGIN_SUCCESS);
+      // send(Actions.LOGIN_SUCCESS);
       send(Actions.JOIN_SESSION);
       trackAction(Actions.JOIN_SESSION);
     });
