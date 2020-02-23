@@ -35,7 +35,12 @@ export interface Post {
 export interface User {
   id: string;
   name: string;
+  accountType: AccountType;
+  username: string | null;
+  photo: string | null;
 }
+
+export type AccountType = 'anonymous' | 'google' | 'twitter' | 'github';
 
 export interface Vote {
   id: string;
