@@ -50,6 +50,14 @@ services:
       REDIS_PORT: 6379 # Not used by default
       REDIS_HOST: redis # Not used by default
       SENTRY_URL: '' # Optional, Sentry URL (https://1234567890abcdef12345@sentry.io/1234567)
+      SESSION_SECRET: changeme
+      TWITTER_KEY: abc
+      TWITTER_SECRET: abc
+      GOOGLE_KEY: abc.apps.googleusercontent.com
+      GOOGLE_SECRET: abc
+      GITHUB_KEY: abc
+      GITHUB_SECRET: abc
+      BASE_URL: http://yourdomain
     restart: unless-stopped
     logging:
       driver: 'json-file'
