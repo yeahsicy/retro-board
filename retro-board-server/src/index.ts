@@ -38,8 +38,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let sessionMiddleware: express.RequestHandler;
 
 if (config.REDIS_ENABLED) {
-  let RedisStore = require('connect-redis')(session);
-  let redisClient = redis.createClient({
+  const RedisStore = connectRedis(session);
+  const redisClient = redis.createClient({
     host: config.REDIS_HOST,
     port: config.REDIS_PORT,
   });
