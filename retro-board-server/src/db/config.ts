@@ -25,6 +25,13 @@ const config: Configuration = {
   BACKEND_PORT: parseInt(process.env.BACKEND_PORT!),
   SQL_LOG: process.env.SQL_LOG === 'true',
   SENTRY_URL: process.env.SENTRY_URL!,
+  BASE_URL: process.env.BASE_URL!,
+  TWITTER_KEY: process.env.TWITTER_KEY!,
+  TWITTER_SECRET: process.env.TWITTER_SECRET!,
+  GOOGLE_KEY: process.env.GOOGLE_KEY!,
+  GOOGLE_SECRET: process.env.GOOGLE_SECRET!,
+  GITHUB_KEY: process.env.GITHUB_KEY!,
+  GITHUB_SECRET: process.env.GITHUB_SECRET!,
 };
 
 export default config;

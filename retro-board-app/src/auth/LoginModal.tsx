@@ -85,9 +85,7 @@ const Login = ({ onClose }: LoginModalProps) => {
       const height = 600;
       const left = window.innerWidth / 2 - width / 2;
       const top = window.innerHeight / 2 - height / 2;
-      const url = `${window.origin}${API_URL}/${provider}?socketId=${
-        socket!.id
-      }`;
+      const url = `${API_URL}/${provider}?socketId=${socket!.id}`;
 
       windowRef.current = window.open(
         url,

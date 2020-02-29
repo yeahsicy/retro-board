@@ -15,7 +15,6 @@ export interface Store {
     columns: ColumnDefinition[]
   ) => Promise<void>;
   saveSession: (user: User, session: Session) => Promise<void>;
-  // saveUser: (user: User) => Promise<void>;
   getOrSaveUser: (user: User) => Promise<User>;
   savePost: (user: User, sessionId: string, post: Post) => Promise<void>;
   saveVote: (
@@ -38,5 +37,12 @@ export interface Configuration {
   REDIS_PORT: number;
   BACKEND_PORT: number;
   SQL_LOG: boolean;
+  BASE_URL: string;
   SENTRY_URL: string;
+  TWITTER_KEY: string;
+  TWITTER_SECRET: string;
+  GOOGLE_KEY: string;
+  GOOGLE_SECRET: string;
+  GITHUB_KEY: string;
+  GITHUB_SECRET: string;
 }
