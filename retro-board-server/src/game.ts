@@ -205,15 +205,6 @@ export default (store: Store, io: SocketIO.Server) => {
     });
   };
 
-  // const login = async (
-  //   user: User,
-  //   session: Session,
-  //   data: UserData,
-  //   socket: ExtendedSocket
-  // ) => {
-  //   recordUser(session.id, data.user, socket);
-  // };
-
   const onDeletePost = async (
     user: User,
     session: Session,
@@ -274,25 +265,16 @@ export default (store: Store, io: SocketIO.Server) => {
     }
   };
 
-  // io.use(function (socket, callback) {
-  //   // console.log('Handshake: ', socket.request);
-  //   if (socket.handshake.query && socket.handshake.query.token) {
-  //     const token = socket.handshake.query.token;
-  //     console.log('Got token: ', token);
-  //     console.log('user: ', socket.request.user);
-  //   }
-  //   callback(null);
-  // });
-
   io.on('connection', (socket: ExtendedSocket) => {
     const ip =
       socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
     const user = socket.request.session?.passport?.user;
     socket.user = user;
-    console.log('Socket user: ', user);
     console.log(
       d() +
-        chalk`{blue Connection: {red New user connected} {grey ${socket.id} ${ip}}}`
+        chalk`{blue Connection: {red New user connected} {grey ${
+          socket.id
+        } ${ip} ${user ? user.username : 'anon'}}}`
     );
 
     interface Action {

@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import socketIo from 'socket.io';
 import socketIoRedisAdapter from 'socket.io-redis';
+import redis from 'redis';
+import connectRedis from 'connect-redis';
 import http from 'http';
 import chalk from 'chalk';
 import db from './db';
@@ -33,11 +35,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // saveUninitialized: true allows us to attach the socket id to the session
 // before we have athenticated the user
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET!,
-  resave: true,
-  saveUninitialized: true,
-});
+let sessionMiddleware: express.RequestHandler;
+
+if (config.REDIS_ENABLED) {
+  let RedisStore = require('connect-redis')(session);
+  let redisClient = redis.createClient({
+    host: config.REDIS_HOST,
+    port: config.REDIS_PORT,
+  });
+  sessionMiddleware = session({
+    secret: process.env.SESSION_SECRET!,
+    resave: true,
+    saveUninitialized: true,
+    store: new RedisStore({ client: redisClient }),
+  });
+} else {
+  sessionMiddleware = session({
+    secret: process.env.SESSION_SECRET!,
+    resave: true,
+    saveUninitialized: true,
+  });
+}
+
 app.use(sessionMiddleware);
 
 app.use(passport.initialize());
