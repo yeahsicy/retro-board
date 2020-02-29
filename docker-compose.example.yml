@@ -51,13 +51,12 @@ services:
       REDIS_HOST: redis # Not used by default
       SENTRY_URL: '' # Optional, Sentry URL (https://1234567890abcdef12345@sentry.io/1234567)
       SESSION_SECRET: changeme
-      TWITTER_KEY: abc
-      TWITTER_SECRET: abc
-      GOOGLE_KEY: abc.apps.googleusercontent.com
-      GOOGLE_SECRET: abc
-      GITHUB_KEY: abc
-      GITHUB_SECRET: abc
-      BASE_URL: http://yourdomain
+      TWITTER_KEY:
+      TWITTER_SECRET:
+      GOOGLE_KEY:
+      GOOGLE_SECRET:
+      GITHUB_KEY:
+      GITHUB_SECRET:
     restart: unless-stopped
     logging:
       driver: 'json-file'

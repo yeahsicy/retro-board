@@ -1,6 +1,5 @@
-import express from 'express';
-import passport, { Strategy } from 'passport';
-import { github, google, twitter } from './controller';
+import express, { Request, Response } from 'express';
+import passport from 'passport';
 
 const router = express.Router();
 // Setting up the passport middleware for each of the OAuth providers
@@ -12,30 +11,27 @@ const facebookAuth = passport.authenticate('facebook');
 const githubAuth = passport.authenticate('github');
 const anonAuth = passport.authenticate('local');
 
+export const endOAuthHandler = (req: Request, res: Response) => {
+  const io = req.app.get('io');
+  io.in(req.session!.socketId).emit('auth', req.user);
+  res.end();
+};
+
+export const endAnonHandler = (req: Request, res: Response) => {
+  res.send(req.user);
+};
+
 // Routes that are triggered by the callbacks from each OAuth provider once
 // the user has authenticated successfully
-router.get('/twitter/callback', twitterAuth, twitter);
-router.get('/google/callback', googleAuth, google);
-router.get('/github/callback', githubAuth, github);
-router.post(
-  '/anonymous/login',
-  (req, res, next) => {
-    console.log('body: ', req.body);
-    next();
-  },
-  anonAuth,
-  (req, res, next) => {
-    console.log('anon login', req.body);
-    // res.end();
-    res.send(req.user);
-  }
-);
+router.get('/twitter/callback', twitterAuth, endOAuthHandler);
+router.get('/google/callback', googleAuth, endOAuthHandler);
+router.get('/github/callback', githubAuth, endOAuthHandler);
+router.post('/anonymous/login', anonAuth, endAnonHandler);
 
 // This custom middleware allows us to attach the socket id to the session
 // With that socket id we can send back the right user info to the right
 // socket
 router.use((req, res, next) => {
-  console.log('Writing socket id', req.session?.socketId);
   req.session!.socketId = req.query.socketId;
   next();
 });

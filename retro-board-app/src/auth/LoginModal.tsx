@@ -29,7 +29,7 @@ import UserContext from './Context';
 import { anonymousLogin } from '../api';
 import styled from 'styled-components';
 
-const API_URL = '/api';
+const API_URL = '/api/auth';
 
 interface LoginModalProps {
   onClose?: () => void;

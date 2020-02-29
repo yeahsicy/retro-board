@@ -11,11 +11,9 @@ import { User, AccountType } from 'retro-board-common';
 export default (store: Store) => {
   // Allowing passport to serialize and deserialize users into sessions
   passport.serializeUser((user, cb) => {
-    console.log('Serializing user: ', user);
     cb(null, user);
   });
   passport.deserializeUser((obj, cb) => {
-    console.log('De-serializing user: ', obj);
     cb(null, obj);
   });
 
@@ -23,13 +21,11 @@ export default (store: Store) => {
   // information. Normally, you would save the user to the database
   // in this callback and it would be customized for each provider
   const callback = (type: AccountType) => async (
-    accessToken: string,
-    refreshToken: string,
+    _accessToken: string,
+    _refreshToken: string,
     profile: any,
     cb: Function
   ) => {
-    console.log('Access token: ', accessToken, refreshToken);
-    console.log('Profile: ', profile);
     const user: User = {
       accountType: type,
       id: uuid.v4(),
@@ -39,11 +35,7 @@ export default (store: Store) => {
         profile.username ||
         (profile.emails.length ? profile.emails[0].value : null),
     };
-    // user.accountType = 'github';
-    // user.username = profile.username;
-    // user.photo = profile.photos[0].value;
     const dbUser = await store.getOrSaveUser(user);
-    console.log('Saving done ', dbUser);
     cb(null, dbUser);
   };
 
@@ -56,10 +48,9 @@ export default (store: Store) => {
       { passwordField: 'password', usernameField: 'username' },
       async (
         username: string,
-        password: string,
+        _password: string,
         done: (error: any, user?: any, options?: IVerifyOptions) => void
       ) => {
-        console.log('Local strategy', username, password);
         const user: User = {
           accountType: 'anonymous',
           id: uuid.v4(),
@@ -68,7 +59,6 @@ export default (store: Store) => {
           username: username,
         };
         const dbUser = await store.getOrSaveUser(user);
-        console.log('Calling done with ', dbUser);
         done(null, dbUser);
       }
     )

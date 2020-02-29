@@ -5,16 +5,10 @@ import { StrategyOptions } from 'passport-github';
 const providers = ['twitter', 'google', 'github'];
 
 const callbacks = providers.map(provider => {
-  return process.env.BASE_URL
-    ? `${process.env.BASE_URL}/api/${provider}/callback`
-    : `http://localhost:3000/api/${provider}/callback`;
+  return `/api/auth/${provider}/callback`;
 });
 
 const [twitterURL, googleURL, githubURL] = callbacks;
-
-export const CLIENT_ORIGIN = process.env.BASE_URL
-  ? process.env.BASE_URL
-  : 'http://localhost:3000';
 
 export const TWITTER_CONFIG: IStrategyOption = {
   consumerKey: process.env.TWITTER_KEY || '',

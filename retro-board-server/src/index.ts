@@ -37,9 +37,6 @@ const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET!,
   resave: true,
   saveUninitialized: true,
-  // cookie: {
-  //   secure: true,
-  // }
 });
 app.use(sessionMiddleware);
 
@@ -58,14 +55,12 @@ app.get('/healthz', async (_, res) => {
   res.status(200).send();
 });
 
-app.use('/api', authRouter);
+app.use('/api/auth', authRouter);
 
 const io = socketIo(httpServer);
 
-io.use(function (socket, next) {
-  // console.log('Handshake2: ', socket.request);
+io.use(function(socket, next) {
   sessionMiddleware(socket.request, {} as any, next);
-  // callback(null);
 });
 
 app.set('io', io);
