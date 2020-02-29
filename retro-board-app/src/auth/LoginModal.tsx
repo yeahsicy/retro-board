@@ -45,7 +45,6 @@ const Login = ({ onClose }: LoginModalProps) => {
     const s = io();
     setSocket(s);
     s.on('auth', (user: User) => {
-      console.log('On provider: ', user);
       setUser(user);
       if (windowRef.current) {
         windowRef.current.close();
@@ -54,23 +53,24 @@ const Login = ({ onClose }: LoginModalProps) => {
       if (onClose) {
         onClose();
       }
-
-      // this.popup.close();
-      // this.setState({ user });
     });
+    return () => {
+      if (s && s.connected) {
+        s.disconnect();
+      }
+    };
   }, [onClose, setUser]);
 
   const [username, setUsername] = useState('');
-  const loginHandler = useCallback(() => {
+  const handleAnonLogin = useCallback(() => {
     async function login() {
-      console.log('about to call login', username);
-      if (username.length) {
-        const user = await anonymousLogin(username);
+      const trimmedUsername = username.trim();
+      if (trimmedUsername.length) {
+        const user = await anonymousLogin(trimmedUsername);
         setUser(user);
         if (onClose) {
           onClose();
         }
-        // login(username, id);
       }
     }
     login();
@@ -81,9 +81,8 @@ const Login = ({ onClose }: LoginModalProps) => {
   );
   const handleOAuth = useCallback(
     (provider: string) => {
-      // const { provider, socket } = this.props;
-      const width = 600,
-        height = 600;
+      const width = 600;
+      const height = 600;
       const left = window.innerWidth / 2 - width / 2;
       const top = window.innerHeight / 2 - height / 2;
       const url = `${API_URL}/${provider}?socketId=${socket!.id}`;
@@ -103,7 +102,11 @@ const Login = ({ onClose }: LoginModalProps) => {
   const handleTwitter = useCallback(() => handleOAuth('twitter'), [
     handleOAuth,
   ]);
-  const handleClose = useCallback(() => {}, []);
+  const handleClose = useCallback(() => {
+    if (onClose) {
+      onClose();
+    }
+  }, [onClose]);
   return (
     <Dialog
       fullScreen={false}
@@ -148,7 +151,7 @@ const Login = ({ onClose }: LoginModalProps) => {
             />
             <CardActions style={{ justifyContent: 'flex-end' }}>
               <Button
-                onClick={loginHandler}
+                onClick={handleAnonLogin}
                 color="primary"
                 autoFocus
                 disabled={!username.trim().length}

@@ -13,9 +13,7 @@ const LoginButton = () => {
   const { setUser } = useContext(UserContext);
   const [modalOpened, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
   const menuAnchor = useRef(null);
-
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const openMenu = useCallback(() => setMenuOpen(true), []);
 
@@ -26,6 +24,7 @@ const LoginButton = () => {
     },
     []
   );
+
   const handleModalClose = useCallback(() => {
     setModalOpen(false);
     setMenuOpen(false);
@@ -35,11 +34,11 @@ const LoginButton = () => {
     logout();
     setUser(null);
   }, [setUser]);
+
   const user = useUser();
   if (user) {
     return (
       <div>
-        {' '}
         <Avatar
           alt={user.name}
           src={user.photo!}
