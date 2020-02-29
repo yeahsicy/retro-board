@@ -40,6 +40,7 @@ const useGame = (sessionId: string) => {
 
   const { session } = state;
   const user = useUser();
+  const [prevUser, setPrevUser] = useState(user);
 
   const name = session ? session.name : '';
   const allowMultipleVotes = session ? session.allowMultipleVotes : false;
@@ -62,6 +63,17 @@ const useGame = (sessionId: string) => {
       resetSession();
     };
   }, [resetSession]);
+
+  // Handles re-connection if the user changes (login/logout)
+  useEffect(() => {
+    if (user !== prevUser) {
+      if (debug) {
+        console.log('User changed, set disconnected to false');
+      }
+      setDisconnected(false);
+      setPrevUser(user);
+    }
+  }, [user, prevUser]);
 
   // This effect will run everytime the gameId, the user, or the socket changes.
   // It will close and restart the socket every time.
