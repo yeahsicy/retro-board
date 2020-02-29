@@ -10,19 +10,12 @@ import useUser from '../../auth/useUser';
 
 const debug = process.env.NODE_ENV === 'development';
 
-function sendFactory(
-  socket: SocketIOClient.Socket,
-  user: User,
-  sessionId: string
-) {
-  return function (action: string, payload?: any) {
-    if (socket && user) {
+function sendFactory(socket: SocketIOClient.Socket, sessionId: string) {
+  return function(action: string, payload?: any) {
+    if (socket) {
       socket.emit(action, {
         sessionId: sessionId,
-        payload: {
-          user,
-          ...payload,
-        },
+        payload,
       });
     }
   };
@@ -52,10 +45,10 @@ const useGame = (sessionId: string) => {
   const allowMultipleVotes = session ? session.allowMultipleVotes : false;
 
   // Send function, built with current socket, user and sessionId
-  const send = useMemo(
-    () => (socket && user ? sendFactory(socket, user, sessionId) : null),
-    [socket, user, sessionId]
-  );
+  const send = useMemo(() => (socket ? sendFactory(socket, sessionId) : null), [
+    socket,
+    sessionId,
+  ]);
 
   const reconnect = useCallback(() => setDisconnected(false), []);
 
@@ -73,19 +66,19 @@ const useGame = (sessionId: string) => {
   // This effect will run everytime the gameId, the user, or the socket changes.
   // It will close and restart the socket every time.
   useEffect(() => {
-    if (!user || disconnected) {
+    if (disconnected) {
       return;
     }
     if (debug) {
       console.log('Initialising Game socket');
     }
     const newSocket = io({
-      query: { token: 'foo ' }
+      query: { token: 'foo ' },
     });
     resetSession();
     setSocket(newSocket);
 
-    const send = sendFactory(newSocket, user, sessionId);
+    const send = sendFactory(newSocket, sessionId);
 
     // Socket events listeners
     newSocket.on('disconnect', () => {

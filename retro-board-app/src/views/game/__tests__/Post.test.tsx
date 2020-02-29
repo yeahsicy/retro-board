@@ -84,7 +84,7 @@ describe('Post', () => {
     expect(deleteHandler).not.toHaveBeenCalled();
   });
 
-  xit('Should let the user delete the post if the author is the user, but not like or dislike', () => {
+  it('Should let the user delete the post if the author is the user, but not like or dislike', () => {
     const customPost: Post = {
       ...post,
       user: u('John Doe'),
@@ -119,7 +119,7 @@ describe('Post', () => {
     expect(dislikeHandler).not.toHaveBeenCalled();
   });
 
-  xit('Should let the user edit the post if the author is the user', () => {
+  it('Should let the user edit the post if the author is the user', () => {
     const customPost: Post = {
       ...post,
       user: u('John Doe'),

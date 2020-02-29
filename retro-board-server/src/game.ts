@@ -82,31 +82,59 @@ export default (store: Store, io: SocketIO.Server) => {
     socket.emit(action, data);
   };
 
-  const persistSession = (user: User, session: Session) =>
+  const persistSession = (user: User, session: Session) => {
+    if (!user) {
+      return;
+    }
     store.saveSession(user, session).catch((err: string) => console.error(err));
+  };
 
-  const persistPost = (user: User, sessionId: string, post: Post) =>
+  const persistPost = (user: User, sessionId: string, post: Post) => {
+    if (!user) {
+      return;
+    }
     store
       .savePost(user, sessionId, post)
       .catch((err: string) => console.error(err));
+  };
 
   const persistVote = (
     user: User,
     sessionId: string,
     postId: string,
     vote: Vote
-  ) => store.saveVote(user, sessionId, postId, vote);
+  ) => {
+    if (!user) {
+      return;
+    }
+    store.saveVote(user, sessionId, postId, vote);
+  };
 
-  const deletePost = (user: User, sessionId: string, postId: string) =>
+  const deletePost = (user: User, sessionId: string, postId: string) => {
+    if (!user) {
+      return;
+    }
     store
       .deletePost(user, sessionId, postId)
       .catch((err: string) => console.error(err));
+  };
 
   const sendClientList = (sessionId: string, socket: ExtendedSocket) => {
     const room = io.nsps['/'].adapter.rooms[getRoom(sessionId)];
     if (room) {
       const clients = Object.keys(room.sockets);
-      const names = clients.map((id, i) => users[id] || `(Anonymous #${i})`);
+      const names = clients.map(
+        (id, i) =>
+          users[id] || {
+            id: socket.id,
+            name: `(Spectator #${i})`,
+            username: null,
+            photo: null,
+            accountType: 'anonymous',
+            created: null,
+            updated: null,
+          }
+      );
 
       sendToSelf(socket, RECEIVE_CLIENT_LIST, names);
       sendToAll(socket, sessionId, RECEIVE_CLIENT_LIST, names);
@@ -132,6 +160,9 @@ export default (store: Store, io: SocketIO.Server) => {
     post: Post,
     socket: ExtendedSocket
   ) => {
+    if (!user) {
+      return;
+    }
     persistPost(user, session.id, post);
     sendToAll(socket, session.id, RECEIVE_POST, post);
   };
@@ -155,6 +186,9 @@ export default (store: Store, io: SocketIO.Server) => {
     data: NameData,
     socket: ExtendedSocket
   ) => {
+    if (!user) {
+      return;
+    }
     session.name = data.name;
     persistSession(user, session);
     sendToAll(socket, session.id, RECEIVE_SESSION_NAME, data.name);
@@ -186,6 +220,9 @@ export default (store: Store, io: SocketIO.Server) => {
     data: Post,
     socket: ExtendedSocket
   ) => {
+    if (!user) {
+      return;
+    }
     session.posts = session.posts.filter(p => p.id !== data.id);
     deletePost(user, session.id, data.id);
     sendToAll(socket, session.id, RECEIVE_DELETE_POST, data);
@@ -197,6 +234,9 @@ export default (store: Store, io: SocketIO.Server) => {
     data: LikeUpdate,
     socket: ExtendedSocket
   ) => {
+    if (!user) {
+      return;
+    }
     const post = find(session.posts, p => p.id === data.post.id);
     if (post) {
       const existingVote: Vote | undefined = find(
@@ -222,6 +262,9 @@ export default (store: Store, io: SocketIO.Server) => {
     data: PostUpdate,
     socket: ExtendedSocket
   ) => {
+    if (!user) {
+      return;
+    }
     const post = find(session.posts, p => p.id === data.post.id);
     if (post) {
       post.content = data.post.content;
@@ -249,7 +292,7 @@ export default (store: Store, io: SocketIO.Server) => {
     console.log('Socket user: ', user);
     console.log(
       d() +
-      chalk`{blue Connection: {red New user connected} {grey ${socket.id} ${ip}}}`
+        chalk`{blue Connection: {red New user connected} {grey ${socket.id} ${ip}}}`
     );
 
     interface Action {
@@ -294,7 +337,7 @@ export default (store: Store, io: SocketIO.Server) => {
         console.log(
           chalk`${d()}{blue Disconnection: }{red User left} {grey ${
             socket.id
-            } ${ip}}`
+          } ${ip}}`
         );
 
         sendClientList(socket.sessionId, socket);
