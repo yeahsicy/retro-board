@@ -18,6 +18,7 @@ import {
 } from 'retro-board-common';
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
+import shortId from 'shortid';
 
 export async function getDb() {
   const connection = await createConnection(getOrmConfig());
@@ -25,20 +26,20 @@ export async function getDb() {
 }
 
 const create = (sessionRepository: SessionRepository) => async (
-  id: string,
-  options: SessionOptions,
-  columns: JsonColumnDefintion[],
+  options: SessionOptions | null,
+  columns: JsonColumnDefintion[] | null,
   author: JsonUser
-) => {
+): Promise<JsonSession> => {
   try {
+    const id = shortId();
     const session = await sessionRepository.findOne({ id });
     if (!session) {
-      await sessionRepository.saveFromJson(
+      return await sessionRepository.saveFromJson(
         {
           ...defaultSession,
           id,
-          ...options,
-          columns,
+          ...(options || {}),
+          columns: columns || defaultSession.columns,
         },
         author.id
       );
@@ -46,6 +47,7 @@ const create = (sessionRepository: SessionRepository) => async (
   } catch (err) {
     throw err;
   }
+  throw Error('The session already existed');
 };
 
 const get = (
