@@ -98,10 +98,20 @@ db().then(store => {
 
   // Create session
   app.post('/api/create/:id', async (req, res) => {
-    console.log('Create: ', req.body, req.params.id);
-    console.log('User: ', req.user);
-    await store.create(req.params.id, req.body.options, req.body.columns);
-    res.status(200).send();
+    const user = getUser(req);
+    if (user) {
+      await store.create(
+        req.params.id,
+        req.body.options,
+        req.body.columns,
+        user
+      );
+      res.status(200).send();
+    } else {
+      res
+        .status(401)
+        .send('You must be logged in in order to create a session');
+    }
   });
 
   app.post('/api/logout', async (req, res, next) => {
@@ -120,6 +130,16 @@ db().then(store => {
       res.status(200).send(user);
     } else {
       res.status(401).send('Not logged in');
+    }
+  });
+
+  app.get('/api/previous', async (req, res) => {
+    const user = getUser(req);
+    if (user) {
+      const sessions = await store.previousSessions(user);
+      res.status(200).send(sessions);
+    } else {
+      res.status(401).send();
     }
   });
 

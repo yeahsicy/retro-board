@@ -8,11 +8,12 @@ import {
 } from 'retro-board-common';
 
 export interface Store {
-  get: (user: User, key: string) => Promise<Session>;
+  get: (user: User, key: string) => Promise<Session | null>;
   create: (
     id: string,
     options: SessionOptions,
-    columns: ColumnDefinition[]
+    columns: ColumnDefinition[],
+    author: User
   ) => Promise<void>;
   saveSession: (user: User, session: Session) => Promise<void>;
   getOrSaveUser: (user: User) => Promise<User>;
@@ -24,6 +25,7 @@ export interface Store {
     vote: Vote
   ) => Promise<void>;
   deletePost: (user: User, sessionId: string, postId: string) => Promise<void>;
+  previousSessions: (user: User) => Promise<Session[]>;
 }
 
 export interface Configuration {

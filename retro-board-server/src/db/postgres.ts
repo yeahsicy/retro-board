@@ -27,17 +27,21 @@ export async function getDb() {
 const create = (sessionRepository: SessionRepository) => async (
   id: string,
   options: SessionOptions,
-  columns: JsonColumnDefintion[]
+  columns: JsonColumnDefintion[],
+  author: JsonUser
 ) => {
   try {
     const session = await sessionRepository.findOne({ id });
     if (!session) {
-      await sessionRepository.saveFromJson({
-        ...defaultSession,
-        id,
-        ...options,
-        columns,
-      });
+      await sessionRepository.saveFromJson(
+        {
+          ...defaultSession,
+          id,
+          ...options,
+          columns,
+        },
+        author.id
+      );
     }
   } catch (err) {
     throw err;
@@ -48,7 +52,7 @@ const get = (
   sessionRepository: SessionRepository,
   postRepository: PostRepository,
   columnRepository: ColumnRepository
-) => async (_: JsonUser, sessionId: string): Promise<JsonSession> => {
+) => async (_: JsonUser, sessionId: string): Promise<JsonSession | null> => {
   try {
     const session = await sessionRepository.findOne({ id: sessionId });
     if (session) {
@@ -66,10 +70,7 @@ const get = (
         posts,
       };
     } else {
-      return {
-        ...defaultSession,
-        id: sessionId,
-      };
+      return null;
     }
   } catch (err) {
     throw err;
@@ -77,10 +78,10 @@ const get = (
 };
 
 const saveSession = (sessionRepository: SessionRepository) => async (
-  _: JsonUser,
+  user: JsonUser,
   session: JsonSession
 ): Promise<void> => {
-  await sessionRepository.saveFromJson(session);
+  await sessionRepository.saveFromJson(session, user.id);
 };
 
 const savePost = (postRepository: PostRepository) => async (
@@ -108,12 +109,6 @@ const deletePost = (postRepository: PostRepository) => async (
   await postRepository.delete({ id: postId, user: { id: user.id } });
 };
 
-// const saveUser = (userRepository: UserRepository) => async (
-//   user: JsonUser
-// ): Promise<void> => {
-//   await userRepository.saveFromJson(user);
-// };
-
 const getOrSaveUser = (userRepository: UserRepository) => async (
   user: JsonUser
 ): Promise<JsonUser> => {
@@ -124,6 +119,12 @@ const getOrSaveUser = (userRepository: UserRepository) => async (
     return existingUser as JsonUser;
   }
   return await userRepository.saveFromJson(user);
+};
+
+const previousSessions = (sessionRepository: SessionRepository) => async (
+  user: JsonUser
+): Promise<JsonSession[]> => {
+  return Promise.resolve([]);
 };
 
 export default async function db(): Promise<Store> {
@@ -142,5 +143,6 @@ export default async function db(): Promise<Store> {
     // saveUser: saveUser(userRepository),
     getOrSaveUser: getOrSaveUser(userRepository),
     create: create(sessionRepository),
+    previousSessions: previousSessions(sessionRepository),
   };
 }

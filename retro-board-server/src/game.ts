@@ -307,8 +307,10 @@ export default (store: Store, io: SocketIO.Server) => {
         const sid =
           action.type === LEAVE_SESSION ? socket.sessionId : data.sessionId;
         if (sid) {
-          store.get(user, sid).then((session: Session) => {
-            action.handler(user, session, data.payload, socket);
+          store.get(user, sid).then((session: Session | null) => {
+            if (session) {
+              action.handler(user, session, data.payload, socket);
+            }
           });
         }
       });

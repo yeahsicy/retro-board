@@ -9,8 +9,6 @@ import { State, Action } from './types';
 import reducer from './reducer';
 import {
   togglePanel,
-  // login,
-  // logout,
   setPlayers,
   receivePost,
   deletePost,
@@ -27,12 +25,13 @@ export const initialState: State = {
   players: [],
   session: {
     ...defaultSession,
+    createdBy: null,
   },
 };
 
 const Context = createContext({
   state: initialState,
-  dispatch: (_: Action) => { },
+  dispatch: (_: Action) => {},
 });
 
 interface ProviderProps {
@@ -53,8 +52,6 @@ export function useGlobalState() {
   const actions = useMemo(() => {
     return {
       togglePanel: togglePanel(dispatch),
-      // login: login(dispatch),
-      // logout: logout(dispatch),
       setPlayers: setPlayers(dispatch),
       receivePost: receivePost(dispatch),
       deletePost: deletePost(dispatch),

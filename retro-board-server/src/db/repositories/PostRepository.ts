@@ -27,7 +27,7 @@ export default class PostRepository extends Repository<Post> {
         ...defaultSession,
         id: sessionId,
       };
-      await sessionRepository.saveFromJson(newSession);
+      await sessionRepository.saveFromJson(newSession, userId);
       await this.saveFromJson(sessionId, userId, post);
     }
   }

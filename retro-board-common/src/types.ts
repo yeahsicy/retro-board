@@ -3,6 +3,7 @@ export interface Session extends SessionOptions {
   name: string | null;
   posts: Post[];
   columns: ColumnDefinition[];
+  createdBy: User;
 }
 
 export interface ColumnDefinition {

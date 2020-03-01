@@ -9,6 +9,7 @@ import {
 import { AccountType } from 'retro-board-common';
 
 @Entity({ name: 'users' })
+@Index(['username', 'accountType'], { unique: true })
 export default class User {
   @PrimaryColumn({ primary: true, generated: false, unique: true })
   public id: string;
@@ -17,7 +18,7 @@ export default class User {
   public name: string;
   @Column({ default: 'anonymous' })
   public accountType: AccountType;
-  @Column({ nullable: true, type: 'character varying', unique: true })
+  @Column({ nullable: true, type: 'character varying' })
   public username: string | null;
   @Column({ nullable: true, type: 'character varying' })
   public photo: string | null;
