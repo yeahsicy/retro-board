@@ -43,7 +43,7 @@ function Home() {
   const user = useUser();
   const isLoggedIn = !!user;
   const translations = useTranslations();
-  const hasPreviousSessions = usePreviousSessions().previousSessions.length > 0;
+  const hasPreviousSessions = usePreviousSessions().length > 0;
   const createSession = useCallback(
     async (options: SessionOptions, columns: ColumnDefinition[]) => {
       const session = await createGame(options, columns);

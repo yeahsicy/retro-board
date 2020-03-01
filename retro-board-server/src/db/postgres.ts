@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
+import { createConnection, Connection } from 'typeorm';
 import {
   SessionRepository,
   PostRepository,
@@ -19,6 +19,7 @@ import {
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
 import shortId from 'shortid';
+import session from 'express-session';
 
 export async function getDb() {
   const connection = await createConnection(getOrmConfig());
@@ -126,7 +127,23 @@ const getOrSaveUser = (userRepository: UserRepository) => async (
 const previousSessions = (sessionRepository: SessionRepository) => async (
   user: JsonUser
 ): Promise<JsonSession[]> => {
-  return Promise.resolve([]);
+  const sessions = await sessionRepository
+    .createQueryBuilder('session')
+    .leftJoin('session.posts', 'posts')
+    .leftJoin('posts.votes', 'votes')
+    .where('session.createdBy.id = :id', { id: user.id })
+    .orWhere('posts.user.id = :id', { id: user.id })
+    .orWhere('votes.user.id = :id', { id: user.id })
+    .getMany();
+
+  return sessions.map(
+    session =>
+      ({
+        ...session,
+        posts: [],
+        columns: [],
+      } as JsonSession)
+  );
 };
 
 export default async function db(): Promise<Store> {

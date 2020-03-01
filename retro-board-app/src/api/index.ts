@@ -40,6 +40,16 @@ export async function me(): Promise<User | null> {
   return null;
 }
 
+export async function fetchPreviousSessions(): Promise<Session[]> {
+  const response = await fetch('/api/previous', {
+    credentials: 'same-origin',
+  });
+  if (response.ok) {
+    return (await response.json()) as Session[];
+  }
+  return Promise.resolve([]);
+}
+
 export async function logout() {
   const response = await fetch(`/api/logout`, {
     method: 'POST',

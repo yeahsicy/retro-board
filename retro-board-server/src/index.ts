@@ -134,7 +134,7 @@ db().then(store => {
 
   app.get('/api/previous', async (req, res) => {
     const user = getUser(req);
-    if (user) {
+    if (user && user.accountType !== 'anonymous') {
       const sessions = await store.previousSessions(user);
       res.status(200).send(sessions);
     } else {
