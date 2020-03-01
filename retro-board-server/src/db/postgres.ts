@@ -19,7 +19,6 @@ import {
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
 import shortId from 'shortid';
-import session from 'express-session';
 
 export async function getDb() {
   const connection = await createConnection(getOrmConfig());
@@ -140,8 +139,6 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
     session =>
       ({
         ...session,
-        posts: [],
-        columns: [],
       } as JsonSession)
   );
 };

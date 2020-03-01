@@ -69,7 +69,7 @@ export async function logout() {
 }
 
 export async function anonymousLogin(username: string): Promise<User | null> {
-  const response = await fetch(`/api/anonymous/login`, {
+  const response = await fetch(`/api/auth/anonymous/login`, {
     method: 'POST',
     mode: 'cors',
     cache: 'no-cache',

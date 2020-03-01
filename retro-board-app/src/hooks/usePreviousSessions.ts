@@ -10,6 +10,7 @@ export default () => {
   useEffect(() => {
     async function load() {
       if (user && user.accountType !== 'anonymous') {
+        console.log('Loading sessions');
         const previousSessions = await fetchPreviousSessions();
         setSessions(previousSessions);
       }
