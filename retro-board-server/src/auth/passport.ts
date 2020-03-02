@@ -11,12 +11,15 @@ import { User, AccountType } from 'retro-board-common';
 export default (store: Store) => {
   // Allowing passport to serialize and deserialize users into sessions
   passport.serializeUser((user: User, cb) => {
-    console.log('Serialize', user, 'to', user.id);
     cb(null, user.id);
   });
-  passport.deserializeUser((obj, cb) => {
-    console.log('DE-Serialize', obj);
-    cb(null, obj);
+  passport.deserializeUser(async (userId: string, cb) => {
+    if (userId && userId.length) {
+      const user = await store.getUser(userId);
+      cb(null, user);
+    } else {
+      cb('User not found', null);
+    }
   });
 
   // The callback that is invoked when an OAuth provider sends back user

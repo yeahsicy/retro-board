@@ -66,6 +66,7 @@ if (config.REDIS_ENABLED) {
 app.use(sessionMiddleware);
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 const httpServer = new http.Server(app);
 
