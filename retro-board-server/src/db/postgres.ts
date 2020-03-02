@@ -54,7 +54,10 @@ const getSession = (
   sessionRepository: SessionRepository,
   postRepository: PostRepository,
   columnRepository: ColumnRepository
-) => async (_: JsonUser, sessionId: string): Promise<JsonSession | null> => {
+) => async (
+  _: string | null,
+  sessionId: string
+): Promise<JsonSession | null> => {
   try {
     const session = await sessionRepository.findOne({ id: sessionId });
     if (session) {
@@ -87,35 +90,35 @@ const getUser = (userRepository: UserRepository) => async (
 };
 
 const saveSession = (sessionRepository: SessionRepository) => async (
-  user: JsonUser,
+  userId: string,
   session: JsonSession
 ): Promise<void> => {
-  await sessionRepository.saveFromJson(session, user.id);
+  await sessionRepository.saveFromJson(session, userId);
 };
 
 const savePost = (postRepository: PostRepository) => async (
-  user: JsonUser,
+  userId: string,
   sessionId: string,
   post: JsonPost
 ): Promise<void> => {
-  await postRepository.saveFromJson(sessionId, user.id, post);
+  await postRepository.saveFromJson(sessionId, userId, post);
 };
 
 const saveVote = (voteRepository: VoteRepository) => async (
-  user: JsonUser,
+  userId: string,
   sessionId: string,
   postId: string,
   vote: JsonVote
 ): Promise<void> => {
-  await voteRepository.saveFromJson(postId, user.id, vote);
+  await voteRepository.saveFromJson(postId, userId, vote);
 };
 
 const deletePost = (postRepository: PostRepository) => async (
-  user: JsonUser,
+  userId: string,
   _: string,
   postId: string
 ): Promise<void> => {
-  await postRepository.delete({ id: postId, user: { id: user.id } });
+  await postRepository.delete({ id: postId, user: { id: userId } });
 };
 
 const getOrSaveUser = (userRepository: UserRepository) => async (
@@ -131,15 +134,15 @@ const getOrSaveUser = (userRepository: UserRepository) => async (
 };
 
 const previousSessions = (sessionRepository: SessionRepository) => async (
-  user: JsonUser
+  userId: string
 ): Promise<JsonSession[]> => {
   const sessions = await sessionRepository
     .createQueryBuilder('session')
     .leftJoin('session.posts', 'posts')
     .leftJoin('posts.votes', 'votes')
-    .where('session.createdBy.id = :id', { id: user.id })
-    .orWhere('posts.user.id = :id', { id: user.id })
-    .orWhere('votes.user.id = :id', { id: user.id })
+    .where('session.createdBy.id = :id', { id: userId })
+    .orWhere('posts.user.id = :id', { id: userId })
+    .orWhere('votes.user.id = :id', { id: userId })
     .getMany();
 
   return sessions.map(
@@ -164,7 +167,6 @@ export default async function db(): Promise<Store> {
     savePost: savePost(postRepository),
     saveVote: saveVote(voteRepository),
     deletePost: deletePost(postRepository),
-    // saveUser: saveUser(userRepository),
     getOrSaveUser: getOrSaveUser(userRepository),
     create: create(sessionRepository),
     previousSessions: previousSessions(sessionRepository),
