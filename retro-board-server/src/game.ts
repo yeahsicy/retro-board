@@ -283,14 +283,14 @@ export default (store: Store, io: SocketIO.Server) => {
   io.on('connection', async (socket: ExtendedSocket) => {
     const ip =
       socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-    const user: User | null = socket.request.user;
-    const userId = user ? user.id : null;
+    // Todo: this is a bit hacky
+    const userId: string = socket.request.session?.passport?.user;
     socket.userId = userId;
     console.log(
       d() +
         chalk`{blue Connection: {red New user connected} {grey ${
           socket.id
-        } ${ip} ${user ? user.username : 'anon'}}}`
+        } ${ip} ${userId ? userId : 'anon'}}}`
     );
 
     interface Action {
