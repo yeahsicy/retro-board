@@ -48,12 +48,18 @@ if (config.REDIS_ENABLED) {
     resave: true,
     saveUninitialized: true,
     store: new RedisStore({ client: redisClient }),
+    cookie: {
+      secure: false,
+    },
   });
 } else {
   sessionMiddleware = session({
     secret: process.env.SESSION_SECRET!,
     resave: true,
     saveUninitialized: true,
+    cookie: {
+      secure: false,
+    },
   });
 }
 
@@ -123,10 +129,11 @@ db().then(store => {
     });
   });
 
-  app.get('/api/me', (req, res) => {
+  app.get('/api/me', async (req, res) => {
     const user = getUser(req);
     if (user) {
-      res.status(200).send(user);
+      const dbUser = await store.getUser(user.id);
+      res.status(200).send(dbUser);
     } else {
       res.status(401).send('Not logged in');
     }

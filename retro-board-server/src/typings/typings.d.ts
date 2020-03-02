@@ -6,12 +6,13 @@ declare namespace Express {
     accountType: AccountType;
     username: string | null;
     photo: string | null;
+    language: string;
   }
 
   interface Session {
     socketId: string;
     passport: {
-      user: User
-    }
+      user: User;
+    };
   }
 }

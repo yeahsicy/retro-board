@@ -10,10 +10,12 @@ import { User, AccountType } from 'retro-board-common';
 
 export default (store: Store) => {
   // Allowing passport to serialize and deserialize users into sessions
-  passport.serializeUser((user, cb) => {
-    cb(null, user);
+  passport.serializeUser((user: User, cb) => {
+    console.log('Serialize', user, 'to', user.id);
+    cb(null, user.id);
   });
   passport.deserializeUser((obj, cb) => {
+    console.log('DE-Serialize', obj);
     cb(null, obj);
   });
 
@@ -31,6 +33,7 @@ export default (store: Store) => {
       id: uuid.v4(),
       name: profile.displayName,
       photo: profile.photos?.length ? profile.photos[0].value : null,
+      language: 'en',
       username:
         profile.username ||
         (profile.emails.length ? profile.emails[0].value : null),
@@ -57,6 +60,7 @@ export default (store: Store) => {
           name: username,
           photo: null,
           username: username,
+          language: 'en',
         };
         const dbUser = await store.getOrSaveUser(user);
         done(null, dbUser);

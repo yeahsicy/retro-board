@@ -8,7 +8,8 @@ import {
 } from 'retro-board-common';
 
 export interface Store {
-  get: (user: User, key: string) => Promise<Session | null>;
+  getSession: (user: User, key: string) => Promise<Session | null>;
+  getUser: (id: string) => Promise<User | null>;
   create: (
     options: SessionOptions | null,
     columns: ColumnDefinition[] | null,

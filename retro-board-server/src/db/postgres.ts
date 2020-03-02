@@ -50,7 +50,7 @@ const create = (sessionRepository: SessionRepository) => async (
   throw Error('The session already existed');
 };
 
-const get = (
+const getSession = (
   sessionRepository: SessionRepository,
   postRepository: PostRepository,
   columnRepository: ColumnRepository
@@ -77,6 +77,13 @@ const get = (
   } catch (err) {
     throw err;
   }
+};
+
+const getUser = (userRepository: UserRepository) => async (
+  id: string
+): Promise<JsonUser | null> => {
+  const user = await userRepository.findOne(id);
+  return user || null;
 };
 
 const saveSession = (sessionRepository: SessionRepository) => async (
@@ -151,7 +158,8 @@ export default async function db(): Promise<Store> {
   const voteRepository = connection.getCustomRepository(VoteRepository);
   const userRepository = connection.getCustomRepository(UserRepository);
   return {
-    get: get(sessionRepository, postRepository, columnRepository),
+    getSession: getSession(sessionRepository, postRepository, columnRepository),
+    getUser: getUser(userRepository),
     saveSession: saveSession(sessionRepository),
     savePost: savePost(postRepository),
     saveVote: saveVote(voteRepository),
