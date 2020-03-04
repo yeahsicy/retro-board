@@ -64,15 +64,12 @@ if (config.REDIS_ENABLED) {
 }
 
 app.use(sessionMiddleware);
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 const httpServer = new http.Server(app);
 
 app.get('/api/ping', (req, res) => {
-  console.log('Session: ', req.session);
-  console.log('User: ', getUser(req));
   res.send('pong');
 });
 
@@ -105,7 +102,7 @@ db().then(store => {
 
   // Create session
   app.post('/api/create', async (req, res) => {
-    const user = getUser(req);
+    const user = await getUser(store, req);
     if (user) {
       const session = await store.create(
         req.body.options || null,
@@ -131,17 +128,16 @@ db().then(store => {
   });
 
   app.get('/api/me', async (req, res) => {
-    const user = getUser(req);
+    const user = await getUser(store, req);
     if (user) {
-      const dbUser = await store.getUser(user.id);
-      res.status(200).send(dbUser);
+      res.status(200).send(user);
     } else {
       res.status(401).send('Not logged in');
     }
   });
 
   app.get('/api/previous', async (req, res) => {
-    const user = getUser(req);
+    const user = await getUser(store, req);
     if (user && user.accountType !== 'anonymous') {
       const sessions = await store.previousSessions(user.id);
       res.status(200).send(sessions);

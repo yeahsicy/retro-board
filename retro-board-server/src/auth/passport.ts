@@ -14,12 +14,13 @@ export default (store: Store) => {
     cb(null, user.id);
   });
   passport.deserializeUser(async (userId: string, cb) => {
-    if (userId && userId.length) {
-      const user = await store.getUser(userId);
-      cb(null, user);
-    } else {
-      cb('User not found', null);
-    }
+    cb(null, userId);
+    // if (userId && userId.length) {
+    //   const user = await store.getUser(userId);
+    //   cb(null, user);
+    // } else {
+    //   cb('User not found', null);
+    // }
   });
 
   // The callback that is invoked when an OAuth provider sends back user
