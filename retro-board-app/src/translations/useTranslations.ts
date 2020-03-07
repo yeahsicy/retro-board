@@ -1,5 +1,6 @@
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect, useCallback } from 'react';
 import LanguageContext from './Context';
+import UserContext from '../auth/Context';
 import en from './en';
 import es from './es';
 import fr from './fr';
@@ -18,6 +19,7 @@ import { Translation } from './types';
 import { merge, cloneDeep } from 'lodash';
 import useUser from '../auth/useUser';
 import { getItem, setItem } from '../utils/localStorage';
+import { updateLanguage as updateLanguageApi } from '../api';
 
 interface Translations {
   [key: string]: Translation;
@@ -40,9 +42,25 @@ const languages: Translations = {
   it,
 };
 
-function useLanguage() {
+export function useLanguage(): [string, (lng: string) => void] {
   const user = useUser();
+  const { setUser } = useContext(UserContext);
   const [language, setLanguage] = useState('en');
+
+  const updateLanguage = useCallback(
+    (language: string) => {
+      setLanguage(language);
+      setItem('language', language);
+      updateLanguageApi(language);
+      if (user) {
+        setUser({
+          ...user,
+          language,
+        });
+      }
+    },
+    [user, setUser]
+  );
 
   useEffect(() => {
     console.log('useLanguage effect', user);
@@ -54,11 +72,11 @@ function useLanguage() {
     }
   }, [user]);
 
-  return language;
+  return [language, updateLanguage];
 }
 
 function useTranslation() {
-  const language = useLanguage();
+  const [language] = useLanguage();
   console.log('Language: ', language);
 
   const result = useMemo(() => {
