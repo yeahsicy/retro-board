@@ -9,6 +9,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  colors,
 } from '@material-ui/core';
 import {
   ThumbUpOutlined,
@@ -16,7 +17,8 @@ import {
   DeleteForeverOutlined,
   FeedbackOutlined,
   Feedback,
-  Gif,
+  Close,
+  EmojiEmotions,
 } from '@material-ui/icons';
 import useTranslations from '../../translations';
 import EditableLabel from '../../components/EditableLabel';
@@ -27,6 +29,7 @@ import { countVotes, enumerateVotes, VoteEnumeration } from './utils';
 import GiphySearchBox from 'react-giphy-searchbox';
 import useGiphy from '../../hooks/useGiphy';
 import config from '../../utils/getConfig';
+import useToggle from '../../hooks/useToggle';
 
 interface PostItemProps {
   post: Post;
@@ -45,6 +48,9 @@ const useStyles = makeStyles(theme => ({
   },
   actionIcon: {
     color: theme.palette.primary.main,
+  },
+  ghipyIcon: {
+    color: colors.yellow[700],
   },
 }));
 
@@ -70,23 +76,21 @@ const PostItem = ({
   const { Actions: translations, Post: postTranslations } = useTranslations();
   const giphyImageUrl = useGiphy(post.giphy);
   const postElement = useRef(null);
-  const [actionsToggled, setActionToggled] = useState(false);
-  const [showGiphy, setShowGiphy] = useState(false);
-  const toggleActionPanel = useCallback(() => {
-    setActionToggled(!actionsToggled);
-  }, [actionsToggled]);
+  const [actionsToggled, toggleAction] = useToggle(false);
+  const [showGiphyEditor, setShowGiphyEditor] = useState(false);
+  const [showGiphyImage, toggleShowGiphyImage] = useToggle(true);
   const upVotes = useMemo(() => countVotes(post, 'like'), [post]);
   const downVotes = useMemo(() => countVotes(post, 'dislike'), [post]);
   const upVoters = useMemo(() => enumerateVotes(post, 'like'), [post]);
   const downVoters = useMemo(() => enumerateVotes(post, 'dislike'), [post]);
   const displayAction = actionsToggled || !!post.action;
   const handleShowGiphy = useCallback(() => {
-    setShowGiphy(true);
+    setShowGiphyEditor(true);
   }, []);
-  const handleHideGiphy = useCallback(() => {
-    setShowGiphy(false);
+  const handleHideGiphyEditor = useCallback(() => {
+    setShowGiphyEditor(false);
   }, []);
-  const handleChooseGiphy = useCallback(
+  const handleChooseGiphyEditor = useCallback(
     (giphyItem: any) => {
       onEditGiphy(giphyItem.id);
     },
@@ -119,10 +123,30 @@ const PostItem = ({
               </Typography>
             </AuthorContainer>
           )}
-          {giphyImageUrl && (
+          {giphyImageUrl && showGiphyImage && (
             <GiphyContainer>
+              <CloseButtonContainer>
+                <Button
+                  onClick={toggleShowGiphyImage}
+                  aria-label="Hide Giphy Image"
+                  tabIndex={-1}
+                >
+                  <Close />
+                </Button>
+              </CloseButtonContainer>
               <img src={giphyImageUrl} alt="Giphy" height="200px" />
             </GiphyContainer>
+          )}
+          {giphyImageUrl && !showGiphyImage && (
+            <HiddenImageMessageContainer>
+              <Typography
+                onClick={toggleShowGiphyImage}
+                variant="caption"
+                style={{ cursor: 'pointer' }}
+              >
+                (hidden image, click to display)
+              </Typography>
+            </HiddenImageMessageContainer>
           )}
         </CardContent>
         {displayAction && canCreateAction && (
@@ -165,7 +189,7 @@ const PostItem = ({
           )}
           {canCreateAction && (
             <Button
-              onClick={toggleActionPanel}
+              onClick={toggleAction}
               aria-label={translations.label}
               title={translations.tooltip}
               disabled={!!post.action}
@@ -185,16 +209,16 @@ const PostItem = ({
               tabIndex={-1}
               ref={postElement}
             >
-              <Gif />
+              <EmojiEmotions className={classes.ghipyIcon} />
             </Button>
           )}
         </CardActions>
       </PostCard>
       <Popover
-        open={showGiphy}
+        open={showGiphyEditor}
         anchorEl={postElement.current}
-        onClose={handleHideGiphy}
-        onEscapeKeyDown={handleHideGiphy}
+        onClose={handleHideGiphyEditor}
+        onEscapeKeyDown={handleHideGiphyEditor}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'left',
@@ -208,7 +232,7 @@ const PostItem = ({
           <CardContent>
             <GiphySearchBox
               apiKey="cnX8V9qGT801TRFb1mOz8dj0N5mKSe0U"
-              onSelect={handleChooseGiphy}
+              onSelect={handleChooseGiphyEditor}
             />
           </CardContent>
         </Card>
@@ -288,6 +312,7 @@ const AuthorContainer = styled.div`
 `;
 
 const GiphyContainer = styled.div`
+  position: relative;
   img {
     width: 100%;
     object-fit: fit;
@@ -295,7 +320,23 @@ const GiphyContainer = styled.div`
   }
 
   margin: -20px;
-  margin-top: 50px;
+  margin-top: 30px;
+`;
+
+const CloseButtonContainer = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
+
+const HiddenImageMessageContainer = styled.div`
+  margin: -20px;
+  margin-top: 30px;
+  padding: 10px;
+  background: #eeeeee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default PostItem;
