@@ -6,6 +6,7 @@ import {
   ColumnRepository,
   VoteRepository,
   UserRepository,
+  SessionTemplateRepository,
 } from './repositories';
 import {
   Session as JsonSession,
@@ -15,6 +16,7 @@ import {
   ColumnDefinition as JsonColumnDefintion,
   SessionOptions,
   defaultSession,
+  defaultOptions,
 } from 'retro-board-common';
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
@@ -25,16 +27,21 @@ export async function getDb() {
   return connection;
 }
 
-const create = (sessionRepository: SessionRepository) => async (
+const create = (
+  sessionRepository: SessionRepository,
+  templateRepository: SessionTemplateRepository,
+  userRepository: UserRepository
+) => async (
   options: SessionOptions | null,
   columns: JsonColumnDefintion[] | null,
+  setDefault: boolean,
   author: JsonUser
 ): Promise<JsonSession> => {
   try {
     const id = shortId();
     const session = await sessionRepository.findOne({ id });
     if (!session) {
-      return await sessionRepository.saveFromJson(
+      const newSession = await sessionRepository.saveFromJson(
         {
           ...defaultSession,
           id,
@@ -43,11 +50,23 @@ const create = (sessionRepository: SessionRepository) => async (
         },
         author.id
       );
+
+      if (setDefault) {
+        const defaultTemplate = await templateRepository.saveFromJson(
+          'Default Template',
+          columns || defaultSession.columns,
+          options || defaultOptions,
+          author.id
+        );
+        await userRepository.persistTemplate(author.id, defaultTemplate.id);
+      }
+
+      return newSession;
     }
   } catch (err) {
     throw err;
   }
-  throw Error('The session already existed');
+  throw Error('The session already exists');
 };
 
 const getSession = (
@@ -173,6 +192,9 @@ export default async function db(): Promise<Store> {
   const columnRepository = connection.getCustomRepository(ColumnRepository);
   const voteRepository = connection.getCustomRepository(VoteRepository);
   const userRepository = connection.getCustomRepository(UserRepository);
+  const templateRepository = connection.getCustomRepository(
+    SessionTemplateRepository
+  );
   return {
     getSession: getSession(sessionRepository, postRepository, columnRepository),
     getUser: getUser(userRepository),
@@ -182,7 +204,7 @@ export default async function db(): Promise<Store> {
     deletePost: deletePost(postRepository),
     getOrSaveUser: getOrSaveUser(userRepository),
     updateUser: updateUser(userRepository),
-    create: create(sessionRepository),
+    create: create(sessionRepository, templateRepository, userRepository),
     previousSessions: previousSessions(sessionRepository),
   };
 }

@@ -13,6 +13,7 @@ export interface Store {
   create: (
     options: SessionOptions | null,
     columns: ColumnDefinition[] | null,
+    setDefault: boolean,
     author: User
   ) => Promise<Session>;
   saveSession: (userId: string, session: Session) => Promise<void>;

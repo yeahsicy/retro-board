@@ -45,8 +45,12 @@ function Home() {
   const translations = useTranslations();
   const hasPreviousSessions = usePreviousSessions().length > 0;
   const createSession = useCallback(
-    async (options: SessionOptions, columns: ColumnDefinition[]) => {
-      const session = await createGame(options, columns);
+    async (
+      options: SessionOptions,
+      columns: ColumnDefinition[],
+      defaultTemplate: boolean
+    ) => {
+      const session = await createGame(defaultTemplate, options, columns);
       if (session) {
         trackEvent('custom-modal/create');
         history.push(`/game/${session.id}`);
@@ -67,7 +71,7 @@ function Home() {
     trackEvent('custom-modal/open');
   }, []);
   const createDefaultSession = useCallback(async () => {
-    const session = await createGame();
+    const session = await createGame(false);
     trackEvent('home/create/default');
     history.push('/game/' + session.id);
   }, [history]);

@@ -7,6 +7,7 @@ import {
 import config from '../utils/getConfig';
 
 export async function createGame(
+  setAsDefaultTemplate: boolean,
   options?: SessionOptions,
   columns?: ColumnDefinition[]
 ): Promise<Session> {
@@ -23,6 +24,7 @@ export async function createGame(
     body: JSON.stringify({
       options: options || null,
       columns: columns || null,
+      setDefault: setAsDefaultTemplate,
     }),
   });
   if (response.ok) {

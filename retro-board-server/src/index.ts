@@ -107,6 +107,7 @@ db().then(store => {
       const session = await store.create(
         req.body.options || null,
         req.body.columns || null,
+        req.body.setDefault || false,
         user
       );
       res.status(200).send(session);
