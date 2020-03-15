@@ -29,11 +29,50 @@ export async function getDb() {
 
 const create = (
   sessionRepository: SessionRepository,
+  userRepository: UserRepository
+) => async (author: JsonUser): Promise<JsonSession> => {
+  try {
+    const id = shortId();
+    const userWithDefaultTemplate = await userRepository.findOne(
+      { id: author.id },
+      { relations: ['defaultTemplate', 'defaultTemplate.columns'] }
+    );
+    if (userWithDefaultTemplate?.defaultTemplate) {
+      const template = userWithDefaultTemplate.defaultTemplate;
+      const newSession = await sessionRepository.saveFromJson(
+        {
+          ...defaultSession,
+          id,
+          options: { ...template.options },
+          columns: template.columns!.map(
+            c => ({ ...c, author: { id: author.id } } as JsonColumnDefintion)
+          ),
+        },
+        author.id
+      );
+      return newSession;
+    } else {
+      const newSession = await sessionRepository.saveFromJson(
+        {
+          ...defaultSession,
+          id,
+        },
+        author.id
+      );
+      return newSession;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+const createCustom = (
+  sessionRepository: SessionRepository,
   templateRepository: SessionTemplateRepository,
   userRepository: UserRepository
 ) => async (
-  options: SessionOptions | null,
-  columns: JsonColumnDefintion[] | null,
+  options: SessionOptions,
+  columns: JsonColumnDefintion[],
   setDefault: boolean,
   author: JsonUser
 ): Promise<JsonSession> => {
@@ -45,8 +84,8 @@ const create = (
         {
           ...defaultSession,
           id,
-          ...(options || {}),
-          columns: columns || defaultSession.columns,
+          options,
+          columns,
         },
         author.id
       );
@@ -54,8 +93,8 @@ const create = (
       if (setDefault) {
         const defaultTemplate = await templateRepository.saveFromJson(
           'Default Template',
-          columns || defaultSession.columns,
-          options || defaultOptions,
+          columns,
+          options,
           author.id
         );
         await userRepository.persistTemplate(author.id, defaultTemplate.id);
@@ -204,7 +243,12 @@ export default async function db(): Promise<Store> {
     deletePost: deletePost(postRepository),
     getOrSaveUser: getOrSaveUser(userRepository),
     updateUser: updateUser(userRepository),
-    create: create(sessionRepository, templateRepository, userRepository),
+    create: create(sessionRepository, userRepository),
+    createCustom: createCustom(
+      sessionRepository,
+      templateRepository,
+      userRepository
+    ),
     previousSessions: previousSessions(sessionRepository),
   };
 }
