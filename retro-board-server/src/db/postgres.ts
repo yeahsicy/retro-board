@@ -14,14 +14,16 @@ import {
   Vote as JsonVote,
   User as JsonUser,
   ColumnDefinition as JsonColumnDefintion,
+  SessionMetadata as JsonSessionMetadata,
   SessionOptions,
   defaultSession,
   defaultOptions,
+  VoteType,
 } from 'retro-board-common';
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
 import shortId from 'shortid';
-import { SessionTemplate } from './entities';
+import { SessionTemplate, Session } from './entities';
 
 export async function getDb() {
   const connection = await createConnection(getOrmConfig());
@@ -217,11 +219,11 @@ const getOrSaveUser = (userRepository: UserRepository) => async (
 
 const previousSessions = (sessionRepository: SessionRepository) => async (
   userId: string
-): Promise<JsonSession[]> => {
+): Promise<JsonSessionMetadata[]> => {
   const sessions = await sessionRepository
     .createQueryBuilder('session')
-    .leftJoin('session.posts', 'posts')
-    .leftJoin('posts.votes', 'votes')
+    .leftJoinAndSelect('session.posts', 'posts')
+    .leftJoinAndSelect('posts.votes', 'votes')
     .where('session.createdBy.id = :id', { id: userId })
     .orWhere('posts.user.id = :id', { id: userId })
     .orWhere('votes.user.id = :id', { id: userId })
@@ -230,10 +232,23 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
   return sessions.map(
     session =>
       ({
-        ...session,
-      } as JsonSession)
+        created: session.created,
+        createdBy: session.createdBy,
+        id: session.id,
+        name: session.name,
+        numberOfNegativeVotes: numberOfVotes('dislike', session),
+        numberOfPositiveVotes: numberOfVotes('like', session),
+        numberOfPosts: session.posts?.length,
+        participants: [],
+      } as JsonSessionMetadata)
   );
 };
+
+function numberOfVotes(type: VoteType, session: Session) {
+  return session.posts!.reduce<number>((prev, cur) => {
+    return prev + cur.votes!.filter(v => v.type === type).length;
+  }, 0);
+}
 
 export default async function db(): Promise<Store> {
   const connection = await getDb();

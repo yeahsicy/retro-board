@@ -78,6 +78,14 @@ function Home() {
 
   return (
     <Page>
+      <Typography
+        gutterBottom
+        variant="h2"
+        component="h2"
+        style={{ fontWeight: 100 }}
+      >
+        Welcome, {user?.name}
+      </Typography>
       <MainCard>
         <CardMedia
           className={classes.media}

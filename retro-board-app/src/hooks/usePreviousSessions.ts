@@ -3,7 +3,7 @@ import useUser from '../auth/useUser';
 import { fetchPreviousSessions } from '../api';
 import { useState, useEffect } from 'react';
 
-export default () => {
+export default (): Session[] => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const user = useUser();
 
