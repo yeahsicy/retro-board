@@ -9,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import PreviousGameItem from './PreviousGameItem';
-import { Session } from 'retro-board-common';
+import { Session, SessionMetadata } from 'retro-board-common';
 
 const getGravatar = (id: string) =>
   `https://www.gravatar.com/avatar/${md5(id)}?d=retro`;
@@ -18,7 +18,7 @@ const PreviousGames = () => {
   const history = useHistory();
   const previousSessions = usePreviousSessions();
   const redirectToGame = useCallback(
-    (session: Session) => {
+    (session: SessionMetadata) => {
       history.push(`/game/${session.id}`);
     },
     [history]

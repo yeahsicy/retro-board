@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { flattenDeep, uniqBy } from 'lodash';
 import { createConnection, Connection } from 'typeorm';
 import {
   SessionRepository,
@@ -222,8 +223,11 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
 ): Promise<JsonSessionMetadata[]> => {
   const sessions = await sessionRepository
     .createQueryBuilder('session')
+    .leftJoinAndSelect('session.createdBy', 'createdBy')
     .leftJoinAndSelect('session.posts', 'posts')
+    .leftJoinAndSelect('posts.user', 'postAuthor')
     .leftJoinAndSelect('posts.votes', 'votes')
+    .leftJoinAndSelect('votes.user', 'voteAuthor')
     .where('session.createdBy.id = :id', { id: userId })
     .orWhere('posts.user.id = :id', { id: userId })
     .orWhere('votes.user.id = :id', { id: userId })
@@ -239,10 +243,21 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
         numberOfNegativeVotes: numberOfVotes('dislike', session),
         numberOfPositiveVotes: numberOfVotes('like', session),
         numberOfPosts: session.posts?.length,
-        participants: [],
+        participants: getParticipans(session),
       } as JsonSessionMetadata)
   );
 };
+
+function getParticipans(session: Session) {
+  return uniqBy(
+    [
+      session.createdBy,
+      ...session.posts!.map(p => p.user),
+      ...flattenDeep(session.posts!.map(p => p.votes!.map(v => v.user))),
+    ].filter(Boolean),
+    u => u.id
+  );
+}
 
 function numberOfVotes(type: VoteType, session: Session) {
   return session.posts!.reduce<number>((prev, cur) => {

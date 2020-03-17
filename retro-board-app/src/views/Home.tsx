@@ -130,14 +130,12 @@ function Home() {
         </CardActions>
       </MainCard>
       {hasPreviousSessions && (
-        <MainCard>
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {translations.Join.previousTab.header}
-            </Typography>
-            <PreviousGames />
-          </CardContent>
-        </MainCard>
+        <>
+          <Typography gutterBottom variant="h5" component="h2">
+            {translations.Join.previousTab.header}
+          </Typography>
+          <PreviousGames />
+        </>
       )}
     </Page>
   );
