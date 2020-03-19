@@ -86,7 +86,31 @@ function Home() {
       >
         Welcome, {user?.name}
       </Typography>
-      <MainCard>
+
+      <LaunchButtons>
+        <Fab
+          variant="extended"
+          onClick={createDefaultSession}
+          size="large"
+          color="secondary"
+          disabled={!isLoggedIn}
+        >
+          <ThumbUpAlt className={classes.buttonIcon} />
+          {translations.Join.standardTab.button}
+        </Fab>
+        <Button onClick={onOpenModal} color="primary" disabled={!isLoggedIn}>
+          <Settings className={classes.buttonIcon} />
+          {translations.Join.standardTab.customizeButton}
+        </Button>
+      </LaunchButtons>
+
+      <CreateSessionModal
+        open={modalOpen}
+        onClose={onCloseModal}
+        onLaunch={createSession}
+      />
+
+      {/* <MainCard>
         <CardMedia
           className={classes.media}
           image={logo}
@@ -101,34 +125,8 @@ function Home() {
             {translations.Join.standardTab.text}
           </Typography>
         </CardContent>
-        <CardActions className={classes.actions}>
-          <LaunchButtons>
-            <Fab
-              variant="extended"
-              onClick={createDefaultSession}
-              size="large"
-              color="secondary"
-              disabled={!isLoggedIn}
-            >
-              <ThumbUpAlt className={classes.buttonIcon} />
-              {translations.Join.standardTab.button}
-            </Fab>
-            <Button
-              onClick={onOpenModal}
-              color="primary"
-              disabled={!isLoggedIn}
-            >
-              <Settings className={classes.buttonIcon} />
-              {translations.Join.standardTab.customizeButton}
-            </Button>
-          </LaunchButtons>
-          <CreateSessionModal
-            open={modalOpen}
-            onClose={onCloseModal}
-            onLaunch={createSession}
-          />
-        </CardActions>
-      </MainCard>
+        <CardActions className={classes.actions}></CardActions>
+      </MainCard> */}
       {hasPreviousSessions && (
         <>
           <Typography gutterBottom variant="h5" component="h2">
