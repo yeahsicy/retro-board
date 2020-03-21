@@ -55,6 +55,14 @@ export interface Post {
   votes: Vote[];
 }
 
+export interface PostGroup {
+  id: string;
+  label: string;
+  column: number;
+  user: User;
+  posts: Post[];
+}
+
 export interface User {
   id: string;
   name: string;
