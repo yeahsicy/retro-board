@@ -4,6 +4,7 @@ import { createConnection, Connection } from 'typeorm';
 import {
   SessionRepository,
   PostRepository,
+  PostGroupRepository,
   ColumnRepository,
   VoteRepository,
   UserRepository,
@@ -12,6 +13,7 @@ import {
 import {
   Session as JsonSession,
   Post as JsonPost,
+  PostGroup as JsonPostGroup,
   Vote as JsonVote,
   User as JsonUser,
   ColumnDefinition as JsonColumnDefintion,
@@ -116,6 +118,7 @@ const createCustom = (
 const getSession = (
   sessionRepository: SessionRepository,
   postRepository: PostRepository,
+  postGroupRepository: PostGroupRepository,
   columnRepository: ColumnRepository
 ) => async (
   _: string | null,
@@ -128,6 +131,10 @@ const getSession = (
         where: { session },
         order: { created: 'ASC' },
       })) as JsonPost[];
+      const groups = (await postGroupRepository.find({
+        where: { session },
+        order: { created: 'ASC' },
+      })) as JsonPostGroup[];
       const columns = (await columnRepository.find({
         where: { session },
         order: { index: 'ASC' },
@@ -136,6 +143,7 @@ const getSession = (
         ...session,
         columns,
         posts,
+        groups,
       };
     } else {
       return null;
@@ -277,6 +285,9 @@ export default async function db(): Promise<Store> {
   const connection = await getDb();
   const sessionRepository = connection.getCustomRepository(SessionRepository);
   const postRepository = connection.getCustomRepository(PostRepository);
+  const postGroupRepository = connection.getCustomRepository(
+    PostGroupRepository
+  );
   const columnRepository = connection.getCustomRepository(ColumnRepository);
   const voteRepository = connection.getCustomRepository(VoteRepository);
   const userRepository = connection.getCustomRepository(UserRepository);
@@ -284,7 +295,12 @@ export default async function db(): Promise<Store> {
     SessionTemplateRepository
   );
   return {
-    getSession: getSession(sessionRepository, postRepository, columnRepository),
+    getSession: getSession(
+      sessionRepository,
+      postRepository,
+      postGroupRepository,
+      columnRepository
+    ),
     getUser: getUser(userRepository),
     saveSession: saveSession(sessionRepository),
     savePost: savePost(postRepository),

@@ -1,16 +1,20 @@
 import React, { SFC, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Input, InputAdornment, makeStyles } from '@material-ui/core';
+import { Input, InputAdornment, Button, makeStyles } from '@material-ui/core';
+import { Add as AddIcon } from '@material-ui/icons';
 import PostItem from './Post';
-import { Post } from 'retro-board-common';
+import { Post, PostGroup } from 'retro-board-common';
 import useUser from '../../auth/useUser';
+import Group from './Group';
 
 interface ColumnProps {
   posts: Post[];
+  groups: PostGroup[];
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>> | null;
   question: string;
   color: string;
   onAdd: (content: string) => void;
+  onAddGroup: () => void;
   onLike: (post: Post) => void;
   onDislike: (post: Post) => void;
   onEdit: (post: Post) => void;
@@ -25,10 +29,12 @@ const useStyles = makeStyles({
 
 const Column: SFC<ColumnProps> = ({
   posts,
+  groups,
   icon: Icon,
   question,
   color,
   onAdd,
+  onAddGroup,
   onLike,
   onDislike,
   onEdit,
@@ -69,6 +75,14 @@ const Column: SFC<ColumnProps> = ({
           }
         />
       </Add>
+      <Groups>
+        <Button onClick={onAddGroup} endIcon={<AddIcon />}>
+          Add a group
+        </Button>
+        {groups.map(group => (
+          <Group key={group.id} group={group} />
+        ))}
+      </Groups>
       <div>
         {posts.map(post => (
           <PostItem
@@ -108,6 +122,8 @@ const ColumnWrapper = styled.div`
   margin-bottom: 10px;
   padding: 0 5px;
 `;
+
+const Groups = styled.div``;
 
 const Add = styled.div`
   margin-bottom: 20px;

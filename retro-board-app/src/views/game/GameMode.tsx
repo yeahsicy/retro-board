@@ -18,6 +18,7 @@ interface GameModeProps {
   columns: ColumnContent[];
   onRenameSession: (name: string) => void;
   onAddPost: (columnIndex: number, content: string) => void;
+  onAddGroup: (columnIndex: number) => void;
   onDeletePost: (post: Post) => void;
   onLike: (post: Post, like: boolean) => void;
   onEdit: (post: Post) => void;
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
 function GameMode({
   onRenameSession,
   onAddPost,
+  onAddGroup,
   onDeletePost,
   onLike,
   onEdit,
@@ -85,10 +87,12 @@ function GameMode({
             <Column
               key={column.index}
               posts={column.posts}
+              groups={column.groups}
               question={column.label}
               icon={getIcon(column.icon)}
               color={column.color}
               onAdd={content => onAddPost(column.index, content)}
+              onAddGroup={() => onAddGroup(column.index)}
               onDelete={onDeletePost}
               onLike={post => onLike(post, true)}
               onDislike={post => onLike(post, false)}

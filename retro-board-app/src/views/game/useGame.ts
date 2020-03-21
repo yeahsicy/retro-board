@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { Actions, Post, Vote, VoteType } from 'retro-board-common';
+import { Actions, Post, PostGroup, Vote, VoteType } from 'retro-board-common';
 import { v4 } from 'uuid';
 import { find } from 'lodash';
 import { trackAction, trackEvent } from './../../track';
@@ -27,6 +27,7 @@ const useGame = (sessionId: string) => {
   const {
     state,
     receivePost,
+    receivePostGroup,
     receiveBoard,
     setPlayers,
     deletePost,
@@ -202,6 +203,25 @@ const useGame = (sessionId: string) => {
     [receivePost, send, user]
   );
 
+  const onAddGroup = useCallback(
+    (columnIndex: number) => {
+      if (send) {
+        const group: PostGroup = {
+          id: v4(),
+          label: 'My Group',
+          column: columnIndex,
+          user: user!,
+          posts: [],
+        };
+
+        receivePostGroup(group);
+        send(Actions.ADD_POST_GROUP_SUCCESS, group);
+        trackAction(Actions.ADD_POST_GROUP_SUCCESS);
+      }
+    },
+    [receivePostGroup, send, user]
+  );
+
   const onEditPost = useCallback(
     (post: Post) => {
       if (send) {
@@ -270,6 +290,7 @@ const useGame = (sessionId: string) => {
     initialised,
     disconnected,
     onAddPost,
+    onAddGroup,
     onEditPost,
     onDeletePost,
     onLike,

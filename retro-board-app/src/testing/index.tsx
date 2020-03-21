@@ -11,6 +11,7 @@ const testingInitialState: State = {
     id: 'test-session',
     name: 'My Retro',
     posts: [],
+    groups: [],
     columns: [],
     createdBy: {
       id: 'John Doe',

@@ -9,6 +9,7 @@ export default function useColumns() {
   const { state } = useGlobalState();
   const { session } = state;
   const posts = session ? session.posts : [];
+  const groups = session ? session.groups : [];
   const cols = session ? session.columns : [];
 
   const columns: ColumnContent[] = useMemo(
@@ -20,10 +21,11 @@ export default function useColumns() {
             ({
               index,
               posts: posts.filter(p => p.column === index),
+              groups: groups.filter(p => p.column === index),
               ...col,
             } as ColumnContent)
         ),
-    [posts, cols, translations]
+    [posts, groups, cols, translations]
   );
   return columns;
 }

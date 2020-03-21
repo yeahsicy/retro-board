@@ -4,6 +4,7 @@ import {
   TOGGLE_PANEL,
   SET_PLAYERS,
   RECEIVE_POST,
+  RECEIVE_POST_GROUP,
   DELETE_POST,
   UPDATE_POST,
   RECEIVE_BOARD,
@@ -27,6 +28,17 @@ export default (state: State, action: Action): State => {
         session: {
           ...state.session,
           posts: [...state.session.posts, action.payload],
+        },
+      };
+    case RECEIVE_POST_GROUP:
+      if (!state.session) {
+        return state;
+      }
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          groups: [...state.session.groups, action.payload],
         },
       };
     case RECEIVE_VOTE:

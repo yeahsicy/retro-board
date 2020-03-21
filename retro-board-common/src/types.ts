@@ -2,6 +2,7 @@ export interface Session {
   id: string;
   name: string | null;
   posts: Post[];
+  groups: PostGroup[];
   columns: ColumnDefinition[];
   options: SessionOptions;
   createdBy: User;

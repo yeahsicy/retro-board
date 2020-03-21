@@ -1,13 +1,12 @@
 import { Dispatch } from './types';
-import { Post, Vote } from 'retro-board-common';
+import { Post, Vote, PostGroup } from 'retro-board-common';
 
 export const TOGGLE_PANEL = 'retrospected/panel/toggle';
-// export const LOGIN = 'retrospected/user/login';
-// export const LOGOUT = 'retrospected/user/logout';
 export const SET_PLAYERS = 'retrospected/game/players/set';
 export const RENAME_SESSION = 'retrospected/game/session/rename';
 export const RESET_SESSION = 'retrospected/game/session/reset';
 export const RECEIVE_POST = 'retrospected/game/post/receive';
+export const RECEIVE_POST_GROUP = 'retrospected/game/group/receive';
 export const RECEIVE_VOTE = 'retrospected/game/post/vote/receive';
 export const DELETE_POST = 'retrospected/game/post/delete';
 export const UPDATE_POST = 'retrospected/game/post/update';
@@ -21,19 +20,6 @@ const createAction = (type: string, payload?: any) => ({
 export const togglePanel = (dispatch: Dispatch) => () => {
   dispatch(createAction(TOGGLE_PANEL));
 };
-
-// export const login = (dispatch: Dispatch) => (username: string, id: string) => {
-//   dispatch(
-//     createAction(LOGIN, {
-//       id,
-//       name: username,
-//     })
-//   );
-// };
-
-// export const logout = (dispatch: Dispatch) => () => {
-//   dispatch(createAction(LOGOUT));
-// };
 
 export const renameSession = (dispatch: Dispatch) => (name: string) => {
   dispatch(createAction(RENAME_SESSION, name));
@@ -49,6 +35,10 @@ export const setPlayers = (dispatch: Dispatch) => (players: string[]) => {
 
 export const receivePost = (dispatch: Dispatch) => (post: Post) => {
   dispatch(createAction(RECEIVE_POST, post));
+};
+
+export const receivePostGroup = (dispatch: Dispatch) => (group: PostGroup) => {
+  dispatch(createAction(RECEIVE_POST_GROUP, group));
 };
 
 export const receiveBoard = (dispatch: Dispatch) => (posts: Post[]) => {

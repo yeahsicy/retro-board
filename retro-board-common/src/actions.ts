@@ -1,6 +1,8 @@
 export default {
   ADD_POST_SUCCESS: 'retrospected/posts/add/success',
+  ADD_POST_GROUP_SUCCESS: 'retrospected/group/add/success',
   RECEIVE_POST: 'retrospected/posts/receive/add',
+  RECEIVE_POST_GROUP: 'retrospected/group/receive/add',
   RECEIVE_BOARD: 'retrospected/posts/receive-all',
   RECEIVE_DELETE_POST: 'retrospected/posts/receive/delete',
   DELETE_POST: 'retrospected/posts/delete',

@@ -37,6 +37,7 @@ function GamePage() {
     initialised,
     disconnected,
     onAddPost,
+    onAddGroup,
     onDeletePost,
     onEditPost,
     onLike,
@@ -89,6 +90,7 @@ function GamePage() {
             columns={columns}
             onEdit={onEditPost}
             onAddPost={onAddPost}
+            onAddGroup={onAddGroup}
             onDeletePost={onDeletePost}
             onLike={onLike}
             onRenameSession={onRenameSession}
