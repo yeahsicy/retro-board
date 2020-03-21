@@ -80,6 +80,7 @@ const createCustom = (
   setDefault: boolean,
   author: JsonUser
 ): Promise<JsonSession> => {
+  console.log('Columns: ', columns.length);
   try {
     const id = shortId();
     const session = await sessionRepository.findOne({ id });
@@ -223,6 +224,7 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
 ): Promise<JsonSessionMetadata[]> => {
   const sessions = await sessionRepository
     .createQueryBuilder('session')
+    .printSql()
     .leftJoinAndSelect('session.createdBy', 'createdBy')
     .leftJoinAndSelect('session.posts', 'posts')
     .leftJoinAndSelect('posts.user', 'postAuthor')
@@ -231,6 +233,7 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
     .where('session.createdBy.id = :id', { id: userId })
     .orWhere('posts.user.id = :id', { id: userId })
     .orWhere('votes.user.id = :id', { id: userId })
+    .orderBy('session.created', 'DESC')
     .getMany();
 
   return sessions.map(
@@ -243,6 +246,7 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
         numberOfNegativeVotes: numberOfVotes('dislike', session),
         numberOfPositiveVotes: numberOfVotes('like', session),
         numberOfPosts: session.posts?.length,
+        numberOfActions: numberOfActions(session),
         participants: getParticipans(session),
       } as JsonSessionMetadata)
   );
@@ -263,6 +267,10 @@ function numberOfVotes(type: VoteType, session: Session) {
   return session.posts!.reduce<number>((prev, cur) => {
     return prev + cur.votes!.filter(v => v.type === type).length;
   }, 0);
+}
+
+function numberOfActions(session: Session) {
+  return session.posts!.filter(p => p.action !== null).length;
 }
 
 export default async function db(): Promise<Store> {

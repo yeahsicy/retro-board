@@ -43,7 +43,8 @@ function Home() {
   const user = useUser();
   const isLoggedIn = !!user;
   const translations = useTranslations();
-  const hasPreviousSessions = usePreviousSessions().length > 0;
+  const previousSessions = usePreviousSessions();
+  const hasPreviousSessions = previousSessions.length > 0;
   const createSession = useCallback(
     async (
       options: SessionOptions,
@@ -78,14 +79,7 @@ function Home() {
 
   return (
     <Page>
-      <Typography
-        gutterBottom
-        variant="h2"
-        component="h2"
-        style={{ fontWeight: 100 }}
-      >
-        Welcome, {user?.name}
-      </Typography>
+      <MainHeader>Welcome, {user?.name}</MainHeader>
 
       <LaunchButtons>
         <Fab
@@ -110,43 +104,35 @@ function Home() {
         onLaunch={createSession}
       />
 
-      {/* <MainCard>
-        <CardMedia
-          className={classes.media}
-          image={logo}
-          component="img"
-          title="Retrospected"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            {translations.Join.welcome}
-          </Typography>
-          <Typography component="p">
-            {translations.Join.standardTab.text}
-          </Typography>
-        </CardContent>
-        <CardActions className={classes.actions}></CardActions>
-      </MainCard> */}
-      {hasPreviousSessions && (
+      {hasPreviousSessions ? (
         <>
-          <Typography gutterBottom variant="h5" component="h2">
-            {translations.Join.previousTab.header}
-          </Typography>
-          <PreviousGames />
+          <SubHeader>{translations.Join.previousTab.header}</SubHeader>
+          <PreviousGames games={previousSessions} />
         </>
-      )}
+      ) : null}
     </Page>
   );
 }
 
-const MainCard = styled(Card)`
-  max-width: 800px;
-  margin: auto;
-  margin-bottom: 20px;
+const MainHeader = styled.h1`
+  font-weight: 100;
+  font-size: 4em;
+  @media screen and (max-width: 500px) {
+    font-size: 2em;
+  }
+`;
+
+const SubHeader = styled.h2`
+  font-weight: 100;
+  font-size: 3em;
+  @media screen and (max-width: 500px) {
+    font-size: 1.5em;
+  }
 `;
 
 const LaunchButtons = styled.div`
   display: flex;
+  margin: 30px 30px 60px;
   > button {
     margin: 0 10px;
   }

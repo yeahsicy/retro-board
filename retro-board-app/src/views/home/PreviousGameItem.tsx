@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import {
   Card as CardBase,
-  CardHeader,
   CardContent,
   Tooltip,
   Typography,
+  colors,
 } from '@material-ui/core';
-import { Session, SessionMetadata } from 'retro-board-common';
+import { SessionMetadata } from 'retro-board-common';
 import { AvatarGroup } from '@material-ui/lab';
 import CustomAvatar from '../../components/Avatar';
 import ItemStat from './ItemStat';
@@ -41,24 +41,29 @@ const PreviousGameItem = ({ session, onClick }: PreviousGameItemProps) => {
         </Typography>
         <Stats>
           <ItemStat
-            value={session.numberOfPosts.toString()}
+            value={session.numberOfPosts}
             label="posts"
-            color="green"
+            color={colors.green[500]}
           />
           <ItemStat
-            value={session.participants.length.toString()}
+            value={session.participants.length}
             label="participants"
-            color="blue"
+            color={colors.indigo[500]}
           />
           <ItemStat
-            value={(
+            value={
               session.numberOfNegativeVotes + session.numberOfPositiveVotes
-            ).toString()}
+            }
             label="votes"
-            color="red"
+            color={colors.red[500]}
+          />
+          <ItemStat
+            value={session.numberOfActions}
+            label="actions"
+            color={colors.amber[500]}
           />
         </Stats>
-        <AvatarGroup title="Participants">
+        <AvatarGroup title="Participants" spacing="small">
           {session.participants.map(user => {
             return (
               <Tooltip title={user.name} key={user.id}>
@@ -73,12 +78,21 @@ const PreviousGameItem = ({ session, onClick }: PreviousGameItemProps) => {
 };
 
 const Card = styled(CardBase)`
-  min-width: 500px;
+  width: 500px;
   cursor: pointer;
+
+  @media screen and (max-width: 500px) {
+    width: calc(100vw - 40px);
+    font-size: 0.5em;
+  }
 `;
 
 const Stats = styled.div`
   display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 10px;
+  background-color: ${colors.grey[100]};
+  margin: 0 -20px 20px;
 `;
 
 export default PreviousGameItem;

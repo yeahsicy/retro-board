@@ -14,6 +14,7 @@ export interface SessionMetadata {
   numberOfPosts: number;
   numberOfPositiveVotes: number;
   numberOfNegativeVotes: number;
+  numberOfActions: number;
   created: Date;
   createdBy: User;
 }

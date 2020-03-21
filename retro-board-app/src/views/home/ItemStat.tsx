@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ItemStatProps {
-  value: string;
+  value: number;
   label: string;
   color: string;
 }
@@ -10,7 +10,7 @@ interface ItemStatProps {
 const ItemStat = ({ value, label, color }: ItemStatProps) => {
   return (
     <Container>
-      <Value style={{ color }}>{value}</Value>
+      <Value style={{ color, fontWeight: 100 }}>{value}</Value>
       <Label>{label}</Label>
     </Container>
   );
@@ -22,6 +22,11 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px 30px;
+  font-weight: 100;
+
+  @media screen and (max-width: 500px) {
+    padding: 10px 15px;
+  }
 `;
 
 const Value = styled.div`
