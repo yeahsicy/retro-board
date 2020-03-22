@@ -20,8 +20,15 @@ export default function useColumns() {
           (col, index) =>
             ({
               index,
-              posts: posts.filter(p => p.column === index),
-              groups: groups.filter(p => p.column === index),
+              posts: posts.filter(p => p.column === index && p.group === null),
+              groups: groups
+                .filter(p => p.column === index)
+                .map(group => ({
+                  ...group,
+                  posts: posts.filter(
+                    p => !!p.group && p.group.id === group.id
+                  ),
+                })),
               ...col,
             } as ColumnContent)
         ),

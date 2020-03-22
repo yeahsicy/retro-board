@@ -6,6 +6,8 @@ export default {
   RECEIVE_BOARD: 'retrospected/posts/receive-all',
   RECEIVE_DELETE_POST: 'retrospected/posts/receive/delete',
   DELETE_POST: 'retrospected/posts/delete',
+  RECEIVE_MOVE_POST: 'retrospected/posts/receive/move',
+  MOVE_POST: 'retrospected/posts/move',
   LIKE_SUCCESS: 'retrospected/posts/like/success',
   RECEIVE_LIKE: 'retrospected/posts/receive/like',
   EDIT_POST: 'retrospected/posts/edit',

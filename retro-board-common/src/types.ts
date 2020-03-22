@@ -53,6 +53,7 @@ export interface Post {
   action: string | null;
   giphy: string | null;
   user: User;
+  group: PostGroup | null;
   votes: Vote[];
 }
 

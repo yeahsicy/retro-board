@@ -198,6 +198,14 @@ const savePost = (postRepository: PostRepository) => async (
   await postRepository.saveFromJson(sessionId, userId, post);
 };
 
+const savePostGroup = (postGroupRepository: PostGroupRepository) => async (
+  userId: string,
+  sessionId: string,
+  group: JsonPostGroup
+): Promise<void> => {
+  await postGroupRepository.saveFromJson(sessionId, userId, group);
+};
+
 const saveVote = (voteRepository: VoteRepository) => async (
   userId: string,
   sessionId: string,
@@ -304,6 +312,7 @@ export default async function db(): Promise<Store> {
     getUser: getUser(userRepository),
     saveSession: saveSession(sessionRepository),
     savePost: savePost(postRepository),
+    savePostGroup: savePostGroup(postGroupRepository),
     saveVote: saveVote(voteRepository),
     deletePost: deletePost(postRepository),
     getOrSaveUser: getOrSaveUser(userRepository),

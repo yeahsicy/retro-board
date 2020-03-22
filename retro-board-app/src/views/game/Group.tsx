@@ -11,9 +11,9 @@ interface GroupProps {
   group: PostGroup;
 }
 
-const Group = ({ group }: GroupProps) => {
+const Group: React.FC<GroupProps> = ({ group, children }) => {
   return (
-    <Droppable droppableId={group.id} type="column">
+    <Droppable droppableId={'group#' + group.id}>
       {(
         dropProvided: DroppableProvided,
         dropSnapshot: DroppableStateSnapshot
@@ -24,6 +24,7 @@ const Group = ({ group }: GroupProps) => {
           draggingOver={dropSnapshot.isDraggingOver}
         >
           {group.label}
+          <div>{children}</div>
         </GroupContainer>
       )}
     </Droppable>

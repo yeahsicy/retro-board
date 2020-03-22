@@ -32,6 +32,7 @@ const useGame = (sessionId: string) => {
     setPlayers,
     deletePost,
     updatePost,
+    movePost,
     receiveVote,
     renameSession,
     resetSession,
@@ -193,6 +194,7 @@ const useGame = (sessionId: string) => {
           id: v4(),
           column: columnIndex,
           user: user!,
+          group: null,
         };
 
         receivePost(post);
@@ -228,6 +230,31 @@ const useGame = (sessionId: string) => {
         updatePost(post);
         send(Actions.EDIT_POST, { post });
         trackAction(Actions.EDIT_POST);
+      }
+    },
+    [updatePost, send]
+  );
+
+  const onMovePost = useCallback(
+    (
+      post: Post,
+      destinationGroup: PostGroup | null,
+      destinationColumn: number,
+      destinationIndex: number
+    ) => {
+      if (send) {
+        const updatedPost: Post = {
+          ...post,
+          column: destinationColumn,
+        };
+        updatePost(updatedPost);
+        send(Actions.EDIT_POST, {
+          post: updatedPost,
+          // destinationGroup,
+          // destinationColumn,
+          // destinationIndex,
+        });
+        trackAction(Actions.MOVE_POST);
       }
     },
     [updatePost, send]
@@ -292,6 +319,7 @@ const useGame = (sessionId: string) => {
     onAddPost,
     onAddGroup,
     onEditPost,
+    onMovePost,
     onDeletePost,
     onLike,
     onRenameSession,

@@ -88,10 +88,40 @@ const Column: SFC<ColumnProps> = ({
           Add a group
         </Button>
         {groups.map(group => (
-          <Group key={group.id} group={group} />
+          <Group key={group.id} group={group}>
+            {posts.map((post, index) => (
+              <PostItem
+                index={index}
+                key={post.id}
+                post={post}
+                color={color}
+                onLike={() => onLike(post)}
+                onDislike={() => onDislike(post)}
+                onDelete={() => onDelete(post)}
+                onEdit={content =>
+                  onEdit({
+                    ...post,
+                    content,
+                  })
+                }
+                onEditAction={action =>
+                  onEdit({
+                    ...post,
+                    action,
+                  })
+                }
+                onEditGiphy={giphy =>
+                  onEdit({
+                    ...post,
+                    giphy,
+                  })
+                }
+              />
+            ))}
+          </Group>
         ))}
       </Groups>
-      <Droppable droppableId={'col' + column.index} type="column">
+      <Droppable droppableId={'column#' + column.index}>
         {(
           dropProvided: DroppableProvided,
           dropSnapshot: DroppableStateSnapshot

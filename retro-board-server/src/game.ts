@@ -2,6 +2,7 @@ import {
   Actions,
   Session,
   Post,
+  PostGroup,
   User,
   Vote,
   VoteType,
@@ -15,11 +16,13 @@ import { Store } from './types';
 
 const {
   RECEIVE_POST,
+  RECEIVE_POST_GROUP,
   RECEIVE_BOARD,
   RECEIVE_DELETE_POST,
   RECEIVE_LIKE,
   RECEIVE_EDIT_POST,
   ADD_POST_SUCCESS,
+  ADD_POST_GROUP_SUCCESS,
   DELETE_POST,
   LIKE_SUCCESS,
   EDIT_POST,
@@ -104,6 +107,19 @@ export default (store: Store, io: SocketIO.Server) => {
       .catch((err: string) => console.error(err));
   };
 
+  const persistPostGroup = (
+    userId: string | null,
+    sessionId: string,
+    group: PostGroup
+  ) => {
+    if (!userId) {
+      return;
+    }
+    store
+      .savePostGroup(userId, sessionId, group)
+      .catch((err: string) => console.error(err));
+  };
+
   const persistVote = (
     userId: string | null,
     sessionId: string,
@@ -175,6 +191,19 @@ export default (store: Store, io: SocketIO.Server) => {
     }
     persistPost(userId, session.id, post);
     sendToAll(socket, session.id, RECEIVE_POST, post);
+  };
+
+  const receivePostGroup = async (
+    userId: string | null,
+    session: Session,
+    group: PostGroup,
+    socket: ExtendedSocket
+  ) => {
+    if (!userId) {
+      return;
+    }
+    persistPostGroup(userId, session.id, group);
+    sendToAll(socket, session.id, RECEIVE_POST_GROUP, group);
   };
 
   const joinSession = async (
@@ -276,6 +305,7 @@ export default (store: Store, io: SocketIO.Server) => {
       post.content = data.post.content;
       post.action = data.post.action;
       post.giphy = data.post.giphy;
+      post.column = data.post.column;
       persistPost(userId, session.id, post);
       sendToAll(socket, session.id, RECEIVE_EDIT_POST, data);
     }
@@ -306,6 +336,7 @@ export default (store: Store, io: SocketIO.Server) => {
 
     const actions: Action[] = [
       { type: ADD_POST_SUCCESS, handler: receivePost },
+      { type: ADD_POST_GROUP_SUCCESS, handler: receivePostGroup },
       { type: JOIN_SESSION, handler: joinSession },
       { type: RENAME_SESSION, handler: renameSession },
       { type: DELETE_POST, handler: onDeletePost },

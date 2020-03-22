@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { Post } from 'retro-board-common';
+import { Post, PostGroup } from 'retro-board-common';
 import { Typography, makeStyles, Box } from '@material-ui/core';
 import {
   DragDropContext,
@@ -18,12 +18,19 @@ import { ColumnContent } from './types';
 import RemainingVotes from './RemainingVotes';
 import useUser from '../../auth/useUser';
 import { Alert } from '@material-ui/lab';
+import { getMovingEntities } from './moving-logic';
 
 interface GameModeProps {
   columns: ColumnContent[];
   onRenameSession: (name: string) => void;
   onAddPost: (columnIndex: number, content: string) => void;
   onAddGroup: (columnIndex: number) => void;
+  onMovePost: (
+    post: Post,
+    destinationGroup: PostGroup | null,
+    destinationColumn: number,
+    destinationIndex: number
+  ) => void;
   onDeletePost: (post: Post) => void;
   onLike: (post: Post, like: boolean) => void;
   onEdit: (post: Post) => void;
@@ -42,6 +49,7 @@ function GameMode({
   onRenameSession,
   onAddPost,
   onAddGroup,
+  onMovePost,
   onDeletePost,
   onLike,
   onEdit,
@@ -57,8 +65,26 @@ function GameMode({
   const handleOnDragEnd = useCallback(
     (result: DropResult, provided: ResponderProvided) => {
       console.log('Drag end', result, provided);
+
+      if (!!result.destination) {
+        const entities = getMovingEntities(
+          result.draggableId,
+          result.destination.droppableId,
+          result.destination.index,
+          columns
+        );
+        if (entities) {
+          console.log('Corretly found entities: ', entities);
+          onMovePost(
+            entities.post,
+            entities.targetGroup,
+            entities.targetColumn,
+            entities.targetIndex
+          );
+        }
+      }
     },
-    []
+    [onMovePost, columns]
   );
 
   if (!state.session) {

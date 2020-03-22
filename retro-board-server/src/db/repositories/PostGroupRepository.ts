@@ -1,19 +1,17 @@
-import { EntityRepository, Repository, getCustomRepository } from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 import { PostGroup } from '../entities';
-import ColumnRepository from './ColumnRepository';
-import {
-  PostGroup as JsonPostGroup,
-  User as JsonUser,
-} from 'retro-board-common/src/types';
+import { PostGroup as JsonPostGroup } from 'retro-board-common/src/types';
 
 @EntityRepository(PostGroup)
 export default class PostGroupRepository extends Repository<PostGroup> {
   async saveFromJson(
-    group: Omit<JsonPostGroup, 'createdBy'>,
-    authorId: string
+    sessionId: string,
+    authorId: string,
+    group: Omit<JsonPostGroup, 'createdBy'>
   ): Promise<JsonPostGroup> {
     const groupWithoutPosts = {
       ...group,
+      session: { id: sessionId },
       createdBy: { id: authorId },
     };
     delete groupWithoutPosts.posts;
