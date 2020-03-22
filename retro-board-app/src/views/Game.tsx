@@ -38,6 +38,7 @@ function GamePage() {
     disconnected,
     onAddPost,
     onMovePost,
+    onCombinePost,
     onAddGroup,
     onDeletePost,
     onEditPost,
@@ -92,6 +93,7 @@ function GamePage() {
             onEdit={onEditPost}
             onAddPost={onAddPost}
             onMovePost={onMovePost}
+            onCombinePost={onCombinePost}
             onAddGroup={onAddGroup}
             onDeletePost={onDeletePost}
             onLike={onLike}

@@ -9,6 +9,26 @@ interface MovingEntities {
   targetIndex: number;
 }
 
+interface CombiningEntities {
+  post1: Post;
+  post2: Post;
+}
+
+export function getCombiningEntities(
+  postId1: string,
+  postId2: string,
+  columns: ColumnContent[]
+): CombiningEntities | null {
+  const post1 = findPost(columns, postId1);
+  const post2 = findPost(columns, postId2);
+
+  if (post1 && post2) {
+    return { post1, post2 };
+  }
+
+  return null;
+}
+
 export function getMovingEntities(
   postId: string,
   targetId: string,

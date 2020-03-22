@@ -6,6 +6,7 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
+import { colors } from '@material-ui/core';
 
 interface GroupProps {
   group: PostGroup;
@@ -13,7 +14,7 @@ interface GroupProps {
 
 const Group: React.FC<GroupProps> = ({ group, children }) => {
   return (
-    <Droppable droppableId={'group#' + group.id}>
+    <Droppable droppableId={'group#' + group.id} key={group.id} mode="standard">
       {(
         dropProvided: DroppableProvided,
         dropSnapshot: DroppableStateSnapshot
@@ -23,8 +24,9 @@ const Group: React.FC<GroupProps> = ({ group, children }) => {
           {...dropProvided.droppableProps}
           draggingOver={dropSnapshot.isDraggingOver}
         >
-          {group.label}
+          <Label>{group.label}</Label>
           <div>{children}</div>
+          {group.posts.length === 0 ? <NoPosts>(empty)</NoPosts> : null}
         </GroupContainer>
       )}
     </Droppable>
@@ -32,11 +34,23 @@ const Group: React.FC<GroupProps> = ({ group, children }) => {
 };
 
 const GroupContainer = styled.div<{ draggingOver: boolean }>`
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 2px;
   border: 2px dashed lightgray;
   border-radius: 10px;
   margin: 20px 0;
-  background-color: ${props => (props.draggingOver ? 'red' : 'unset')};
+  background-color: ${props =>
+    props.draggingOver ? colors.grey[100] : 'unset'};
+`;
+
+const Label = styled.div``;
+
+const NoPosts = styled.div`
+  color: grey;
+  text-align: center;
+  font-weight: 2em;
+  margin: 30px;
 `;
 
 export default Group;

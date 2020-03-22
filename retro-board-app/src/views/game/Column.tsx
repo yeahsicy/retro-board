@@ -121,7 +121,7 @@ const Column: SFC<ColumnProps> = ({
           </Group>
         ))}
       </Groups>
-      <Droppable droppableId={'column#' + column.index}>
+      <Droppable droppableId={'column#' + column.index} isCombineEnabled>
         {(
           dropProvided: DroppableProvided,
           dropSnapshot: DroppableStateSnapshot
@@ -183,6 +183,7 @@ const PostsWrapper = styled.div<{
   background-color: ${props =>
     props.draggingOver ? props.draggingColor : 'unset'};
   flex: 1;
+  min-height: 500px;
 `;
 
 const Groups = styled.div``;

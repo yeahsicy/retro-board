@@ -18,7 +18,7 @@ import { ColumnContent } from './types';
 import RemainingVotes from './RemainingVotes';
 import useUser from '../../auth/useUser';
 import { Alert } from '@material-ui/lab';
-import { getMovingEntities } from './moving-logic';
+import { getMovingEntities, getCombiningEntities } from './moving-logic';
 
 interface GameModeProps {
   columns: ColumnContent[];
@@ -31,6 +31,7 @@ interface GameModeProps {
     destinationColumn: number,
     destinationIndex: number
   ) => void;
+  onCombinePost: (post1: Post, post2: Post) => void;
   onDeletePost: (post: Post) => void;
   onLike: (post: Post, like: boolean) => void;
   onEdit: (post: Post) => void;
@@ -50,6 +51,7 @@ function GameMode({
   onAddPost,
   onAddGroup,
   onMovePost,
+  onCombinePost,
   onDeletePost,
   onLike,
   onEdit,
@@ -83,8 +85,19 @@ function GameMode({
           );
         }
       }
+      if (!!result.combine) {
+        const entities = getCombiningEntities(
+          result.draggableId,
+          result.combine.draggableId,
+          columns
+        );
+        console.log('Comlbining: ', entities);
+        if (entities) {
+          onCombinePost(entities.post1, entities.post2);
+        }
+      }
     },
-    [onMovePost, columns]
+    [onMovePost, onCombinePost, columns]
   );
 
   if (!state.session) {

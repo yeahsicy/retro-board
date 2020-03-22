@@ -250,14 +250,53 @@ const useGame = (sessionId: string) => {
         updatePost(updatedPost);
         send(Actions.EDIT_POST, {
           post: updatedPost,
-          // destinationGroup,
-          // destinationColumn,
-          // destinationIndex,
         });
         trackAction(Actions.MOVE_POST);
       }
     },
     [updatePost, send]
+  );
+
+  const onCombinePost = useCallback(
+    (post1: Post, post2: Post) => {
+      if (send) {
+        const destinationColumn = post2.column;
+        const group: PostGroup = {
+          id: v4(),
+          label: 'My Group',
+          column: post2.column,
+          user: user!,
+          posts: [],
+        };
+
+        receivePostGroup(group);
+        send(Actions.ADD_POST_GROUP_SUCCESS, group);
+        trackAction(Actions.ADD_POST_GROUP_SUCCESS);
+
+        const updatedPost1: Post = {
+          ...post1,
+          column: destinationColumn,
+          group: group,
+        };
+        updatePost(updatedPost1);
+        send(Actions.EDIT_POST, {
+          post: updatedPost1,
+        });
+
+        const updatedPost2: Post = {
+          ...post2,
+          column: destinationColumn,
+          group: group,
+        };
+        updatePost(updatedPost2);
+        send(Actions.EDIT_POST, {
+          post: updatedPost2,
+        });
+
+        trackAction(Actions.MOVE_POST);
+      }
+    },
+    [updatePost, user, receivePostGroup, send]
   );
 
   const onDeletePost = useCallback(
@@ -320,6 +359,7 @@ const useGame = (sessionId: string) => {
     onAddGroup,
     onEditPost,
     onMovePost,
+    onCombinePost,
     onDeletePost,
     onLike,
     onRenameSession,
