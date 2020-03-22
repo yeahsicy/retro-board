@@ -303,17 +303,18 @@ export default (store: Store, io: SocketIO.Server) => {
     if (!userId) {
       return;
     }
+    const user = await store.getUser(userId);
     const post = find(session.posts, p => p.id === data.post.id);
-    if (post) {
+    if (post && user) {
       const existingVote: Vote | undefined = find(
         post.votes,
-        v => v.user.id === data.user.id && v.type === data.type
+        v => v.user.id === user.id && v.type === data.type
       );
 
       if (session.options.allowMultipleVotes || !existingVote) {
         const vote: Vote = {
           id: uuid.v4(),
-          user: data.user,
+          user: user,
           type: data.type,
         };
         persistVote(userId, session.id, post.id, vote);
