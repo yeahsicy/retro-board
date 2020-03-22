@@ -32,6 +32,8 @@ const useGame = (sessionId: string) => {
     setPlayers,
     deletePost,
     updatePost,
+    deletePostGroup,
+    updatePostGroup,
     receiveVote,
     renameSession,
     resetSession,
@@ -234,6 +236,17 @@ const useGame = (sessionId: string) => {
     [updatePost, send]
   );
 
+  const onEditPostGroup = useCallback(
+    (group: PostGroup) => {
+      if (send) {
+        updatePostGroup(group);
+        send(Actions.EDIT_POST_GROUP, group);
+        trackAction(Actions.EDIT_POST_GROUP);
+      }
+    },
+    [updatePostGroup, send]
+  );
+
   const onMovePost = useCallback(
     (
       post: Post,
@@ -310,6 +323,17 @@ const useGame = (sessionId: string) => {
     [deletePost, send]
   );
 
+  const onDeletePostGroup = useCallback(
+    (group: PostGroup) => {
+      if (send) {
+        deletePostGroup(group);
+        send(Actions.DELETE_POST_GROUP, group);
+        trackAction(Actions.DELETE_POST_GROUP);
+      }
+    },
+    [deletePostGroup, send]
+  );
+
   const onLike = useCallback(
     (post: Post, like: boolean) => {
       if (send) {
@@ -358,9 +382,11 @@ const useGame = (sessionId: string) => {
     onAddPost,
     onAddGroup,
     onEditPost,
+    onEditPostGroup,
     onMovePost,
     onCombinePost,
     onDeletePost,
+    onDeletePostGroup,
     onLike,
     onRenameSession,
     reconnect,

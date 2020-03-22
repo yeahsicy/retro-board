@@ -35,6 +35,8 @@ interface GameModeProps {
   onDeletePost: (post: Post) => void;
   onLike: (post: Post, like: boolean) => void;
   onEdit: (post: Post) => void;
+  onEditGroup: (group: PostGroup) => void;
+  onDeleteGroup: (group: PostGroup) => void;
 }
 
 const useStyles = makeStyles({
@@ -55,6 +57,8 @@ function GameMode({
   onDeletePost,
   onLike,
   onEdit,
+  onEditGroup,
+  onDeleteGroup,
   columns,
 }: GameModeProps) {
   const translations = useTranslations();
@@ -150,6 +154,8 @@ function GameMode({
                 onLike={post => onLike(post, true)}
                 onDislike={post => onLike(post, false)}
                 onEdit={onEdit}
+                onEditGroup={onEditGroup}
+                onDeleteGroup={onDeleteGroup}
               />
             ))}
           </Columns>

@@ -7,12 +7,21 @@ import {
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
 import { colors } from '@material-ui/core';
+import EditableLabel from '../../components/EditableLabel';
 
 interface GroupProps {
   group: PostGroup;
+  readonly: boolean;
+  onEditLabel: (label: string) => void;
+  onDelete: (group: PostGroup) => void;
 }
 
-const Group: React.FC<GroupProps> = ({ group, children }) => {
+const Group: React.FC<GroupProps> = ({
+  group,
+  onEditLabel,
+  readonly,
+  children,
+}) => {
   return (
     <Droppable droppableId={'group#' + group.id} key={group.id} mode="standard">
       {(
@@ -24,7 +33,13 @@ const Group: React.FC<GroupProps> = ({ group, children }) => {
           {...dropProvided.droppableProps}
           draggingOver={dropSnapshot.isDraggingOver}
         >
-          <Label>{group.label}</Label>
+          <Label>
+            <EditableLabel
+              value={group.label}
+              onChange={onEditLabel}
+              readOnly={readonly}
+            />
+          </Label>
           <div>{children}</div>
           {group.posts.length === 0 ? <NoPosts>(empty)</NoPosts> : null}
         </GroupContainer>

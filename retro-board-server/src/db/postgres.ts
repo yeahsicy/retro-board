@@ -22,6 +22,7 @@ import {
   defaultSession,
   defaultOptions,
   VoteType,
+  PostGroup,
 } from 'retro-board-common';
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
@@ -223,6 +224,14 @@ const deletePost = (postRepository: PostRepository) => async (
   await postRepository.delete({ id: postId, user: { id: userId } });
 };
 
+const deletePostGroup = (postGroupRepository: PostGroupRepository) => async (
+  userId: string,
+  _: string,
+  groupId: string
+): Promise<void> => {
+  await postGroupRepository.delete({ id: groupId, user: { id: userId } });
+};
+
 const getOrSaveUser = (userRepository: UserRepository) => async (
   user: JsonUser
 ): Promise<JsonUser> => {
@@ -315,6 +324,7 @@ export default async function db(): Promise<Store> {
     savePostGroup: savePostGroup(postGroupRepository),
     saveVote: saveVote(voteRepository),
     deletePost: deletePost(postRepository),
+    deletePostGroup: deletePostGroup(postGroupRepository),
     getOrSaveUser: getOrSaveUser(userRepository),
     updateUser: updateUser(userRepository),
     create: create(sessionRepository, userRepository),

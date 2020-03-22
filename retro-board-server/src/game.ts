@@ -21,11 +21,15 @@ const {
   RECEIVE_DELETE_POST,
   RECEIVE_LIKE,
   RECEIVE_EDIT_POST,
+  RECEIVE_DELETE_POST_GROUP,
+  RECEIVE_EDIT_POST_GROUP,
   ADD_POST_SUCCESS,
   ADD_POST_GROUP_SUCCESS,
   DELETE_POST,
   LIKE_SUCCESS,
   EDIT_POST,
+  DELETE_POST_GROUP,
+  EDIT_POST_GROUP,
   RECEIVE_CLIENT_LIST,
   RECEIVE_SESSION_NAME,
   JOIN_SESSION,
@@ -145,6 +149,19 @@ export default (store: Store, io: SocketIO.Server) => {
       .catch((err: string) => console.error(err));
   };
 
+  const deletePostGroup = (
+    userId: string | null,
+    sessionId: string,
+    groupId: string
+  ) => {
+    if (!userId) {
+      return;
+    }
+    store
+      .deletePostGroup(userId, sessionId, groupId)
+      .catch((err: string) => console.error(err));
+  };
+
   const sendClientList = (sessionId: string, socket: ExtendedSocket) => {
     const room = io.nsps['/'].adapter.rooms[getRoom(sessionId)];
     if (room) {
@@ -180,7 +197,7 @@ export default (store: Store, io: SocketIO.Server) => {
     sendClientList(sessionId, socket);
   };
 
-  const receivePost = async (
+  const onAddPost = async (
     userId: string | null,
     session: Session,
     post: Post,
@@ -193,7 +210,7 @@ export default (store: Store, io: SocketIO.Server) => {
     sendToAll(socket, session.id, RECEIVE_POST, post);
   };
 
-  const receivePostGroup = async (
+  const onAddPostGroup = async (
     userId: string | null,
     session: Session,
     group: PostGroup,
@@ -206,7 +223,7 @@ export default (store: Store, io: SocketIO.Server) => {
     sendToAll(socket, session.id, RECEIVE_POST_GROUP, group);
   };
 
-  const joinSession = async (
+  const onJoinSession = async (
     userId: string | null,
     session: Session,
     _: UserData,
@@ -224,7 +241,7 @@ export default (store: Store, io: SocketIO.Server) => {
     });
   };
 
-  const renameSession = async (
+  const onRenameSession = async (
     userId: string | null,
     session: Session,
     data: NameData,
@@ -238,7 +255,7 @@ export default (store: Store, io: SocketIO.Server) => {
     sendToAll(socket, session.id, RECEIVE_SESSION_NAME, data.name);
   };
 
-  const leave = async (
+  const onLeaveSession = async (
     _userId: string | null,
     session: Session,
     _data: void,
@@ -263,7 +280,21 @@ export default (store: Store, io: SocketIO.Server) => {
     sendToAll(socket, session.id, RECEIVE_DELETE_POST, data);
   };
 
-  const like = async (
+  const onDeletePostGroup = async (
+    userId: string | null,
+    session: Session,
+    data: PostGroup,
+    socket: ExtendedSocket
+  ) => {
+    if (!userId) {
+      return;
+    }
+    session.groups = session.groups.filter(g => g.id !== data.id);
+    deletePostGroup(userId, session.id, data.id);
+    sendToAll(socket, session.id, RECEIVE_DELETE_POST_GROUP, data);
+  };
+
+  const onLikePost = async (
     userId: string | null,
     session: Session,
     data: LikeUpdate,
@@ -291,7 +322,7 @@ export default (store: Store, io: SocketIO.Server) => {
     }
   };
 
-  const edit = async (
+  const onEditPost = async (
     userId: string | null,
     session: Session,
     data: PostUpdate,
@@ -309,6 +340,24 @@ export default (store: Store, io: SocketIO.Server) => {
       post.group = data.post.group;
       persistPost(userId, session.id, post);
       sendToAll(socket, session.id, RECEIVE_EDIT_POST, data);
+    }
+  };
+
+  const onEditPostGroup = async (
+    userId: string | null,
+    session: Session,
+    data: PostGroup,
+    socket: ExtendedSocket
+  ) => {
+    if (!userId) {
+      return;
+    }
+    const group = find(session.groups, g => g.id === data.id);
+    if (group) {
+      group.column = data.column;
+      group.label = data.label;
+      persistPostGroup(userId, session.id, group);
+      sendToAll(socket, session.id, RECEIVE_EDIT_POST_GROUP, data);
     }
   };
 
@@ -336,14 +385,18 @@ export default (store: Store, io: SocketIO.Server) => {
     }
 
     const actions: Action[] = [
-      { type: ADD_POST_SUCCESS, handler: receivePost },
-      { type: ADD_POST_GROUP_SUCCESS, handler: receivePostGroup },
-      { type: JOIN_SESSION, handler: joinSession },
-      { type: RENAME_SESSION, handler: renameSession },
+      { type: ADD_POST_SUCCESS, handler: onAddPost },
+      { type: EDIT_POST, handler: onEditPost },
       { type: DELETE_POST, handler: onDeletePost },
-      { type: LIKE_SUCCESS, handler: like },
-      { type: EDIT_POST, handler: edit },
-      { type: LEAVE_SESSION, handler: leave },
+      { type: LIKE_SUCCESS, handler: onLikePost },
+
+      { type: ADD_POST_GROUP_SUCCESS, handler: onAddPostGroup },
+      { type: EDIT_POST_GROUP, handler: onEditPostGroup },
+      { type: DELETE_POST_GROUP, handler: onDeletePostGroup },
+
+      { type: JOIN_SESSION, handler: onJoinSession },
+      { type: RENAME_SESSION, handler: onRenameSession },
+      { type: LEAVE_SESSION, handler: onLeaveSession },
     ];
 
     actions.forEach(action => {

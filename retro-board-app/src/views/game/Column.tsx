@@ -22,6 +22,8 @@ interface ColumnProps {
   color: string;
   onAdd: (content: string) => void;
   onAddGroup: () => void;
+  onEditGroup: (group: PostGroup) => void;
+  onDeleteGroup: (group: PostGroup) => void;
   onLike: (post: Post) => void;
   onDislike: (post: Post) => void;
   onEdit: (post: Post) => void;
@@ -47,6 +49,8 @@ const Column: SFC<ColumnProps> = ({
   onDislike,
   onEdit,
   onDelete,
+  onEditGroup,
+  onDeleteGroup,
 }) => {
   const user = useUser();
   const isLoggedIn = !!user;
@@ -88,7 +92,18 @@ const Column: SFC<ColumnProps> = ({
           Add a group
         </Button>
         {groups.map(group => (
-          <Group key={group.id} group={group}>
+          <Group
+            key={group.id}
+            group={group}
+            readonly={false}
+            onEditLabel={label =>
+              onEditGroup({
+                ...group,
+                label,
+              })
+            }
+            onDelete={() => onDeleteGroup(group)}
+          >
             {group.posts.map((post, index) => (
               <PostItem
                 index={index}

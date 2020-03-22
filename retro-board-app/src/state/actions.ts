@@ -10,6 +10,8 @@ export const RECEIVE_POST_GROUP = 'retrospected/game/group/receive';
 export const RECEIVE_VOTE = 'retrospected/game/post/vote/receive';
 export const DELETE_POST = 'retrospected/game/post/delete';
 export const UPDATE_POST = 'retrospected/game/post/update';
+export const DELETE_POST_GROUP = 'retrospected/game/group/delete';
+export const UPDATE_POST_GROUP = 'retrospected/game/group/update';
 export const RECEIVE_BOARD = 'retrospected/game/board/receive';
 
 const createAction = (type: string, payload?: any) => ({
@@ -49,6 +51,10 @@ export const updatePost = (dispatch: Dispatch) => (post: Post) => {
   dispatch(createAction(UPDATE_POST, post));
 };
 
+export const updatePostGroup = (dispatch: Dispatch) => (group: PostGroup) => {
+  dispatch(createAction(UPDATE_POST_GROUP, group));
+};
+
 export const receiveVote = (dispatch: Dispatch) => (
   postId: string,
   vote: Vote
@@ -58,4 +64,8 @@ export const receiveVote = (dispatch: Dispatch) => (
 
 export const deletePost = (dispatch: Dispatch) => (post: Post) => {
   dispatch(createAction(DELETE_POST, post));
+};
+
+export const deletePostGroup = (dispatch: Dispatch) => (group: PostGroup) => {
+  dispatch(createAction(DELETE_POST_GROUP, group));
 };

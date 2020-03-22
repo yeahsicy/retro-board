@@ -44,6 +44,11 @@ export interface Store {
     sessionId: string,
     postId: string
   ) => Promise<void>;
+  deletePostGroup: (
+    userId: string,
+    sessionId: string,
+    groupId: string
+  ) => Promise<void>;
   previousSessions: (userId: string) => Promise<SessionMetadata[]>;
 }
 

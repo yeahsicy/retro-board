@@ -42,6 +42,8 @@ function GamePage() {
     onAddGroup,
     onDeletePost,
     onEditPost,
+    onDeletePostGroup,
+    onEditPostGroup,
     onLike,
     onRenameSession,
     reconnect,
@@ -97,6 +99,8 @@ function GamePage() {
             onAddGroup={onAddGroup}
             onDeletePost={onDeletePost}
             onLike={onLike}
+            onDeleteGroup={onDeletePostGroup}
+            onEditGroup={onEditPostGroup}
             onRenameSession={onRenameSession}
           />
         )}

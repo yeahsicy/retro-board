@@ -7,6 +7,8 @@ import {
   RECEIVE_POST_GROUP,
   DELETE_POST,
   UPDATE_POST,
+  DELETE_POST_GROUP,
+  UPDATE_POST_GROUP,
   RECEIVE_BOARD,
   RENAME_SESSION,
   RESET_SESSION,
@@ -80,6 +82,17 @@ export default (state: State, action: Action): State => {
           posts: state.session.posts.filter(p => p.id !== action.payload.id),
         },
       };
+    case DELETE_POST_GROUP:
+      if (!state.session) {
+        return state;
+      }
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          groups: state.session.groups.filter(g => g.id !== action.payload.id),
+        },
+      };
     case UPDATE_POST:
       if (!state.session) {
         return state;
@@ -99,6 +112,28 @@ export default (state: State, action: Action): State => {
             ...state.session.posts.slice(0, index),
             action.payload,
             ...state.session.posts.slice(index + 1),
+          ],
+        },
+      };
+    case UPDATE_POST_GROUP:
+      if (!state.session) {
+        return state;
+      }
+      const groupIndex = findIndex(
+        state.session.groups,
+        g => g.id === action.payload.id
+      );
+      if (groupIndex === -1) {
+        return state;
+      }
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          groups: [
+            ...state.session.groups.slice(0, groupIndex),
+            action.payload,
+            ...state.session.groups.slice(groupIndex + 1),
           ],
         },
       };
