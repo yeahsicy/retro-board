@@ -6,7 +6,8 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
-import { colors } from '@material-ui/core';
+import { colors, Button } from '@material-ui/core';
+import { Delete } from '@material-ui/icons';
 import EditableLabel from '../../components/EditableLabel';
 
 interface GroupProps {
@@ -19,6 +20,7 @@ interface GroupProps {
 const Group: React.FC<GroupProps> = ({
   group,
   onEditLabel,
+  onDelete,
   readonly,
   children,
 }) => {
@@ -33,6 +35,9 @@ const Group: React.FC<GroupProps> = ({
           {...dropProvided.droppableProps}
           draggingOver={dropSnapshot.isDraggingOver}
         >
+          <DeleteContainer>
+            <Button endIcon={<Delete />} onClick={() => onDelete(group)} />
+          </DeleteContainer>
           <Label>
             <EditableLabel
               value={group.label}
@@ -49,6 +54,7 @@ const Group: React.FC<GroupProps> = ({
 };
 
 const GroupContainer = styled.div<{ draggingOver: boolean }>`
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 20px 2px;
@@ -60,6 +66,12 @@ const GroupContainer = styled.div<{ draggingOver: boolean }>`
 `;
 
 const Label = styled.div``;
+
+const DeleteContainer = styled.div`
+  position: absolute;
+  top: 3px;
+  right: 3px;
+`;
 
 const NoPosts = styled.div`
   color: grey;

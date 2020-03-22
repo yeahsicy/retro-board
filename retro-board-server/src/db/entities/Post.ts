@@ -18,7 +18,13 @@ export default class Post {
   public id: string;
   @ManyToOne(() => Session, { nullable: false })
   public session: Session;
-  @ManyToOne(() => PostGroup, { nullable: true, eager: true })
+  @ManyToOne(() => PostGroup, {
+    nullable: true,
+    eager: true,
+    cascade: true,
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
   public group: PostGroup | null;
   @Column({ default: 0 })
   public column: number;
