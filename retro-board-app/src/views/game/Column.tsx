@@ -6,8 +6,15 @@ import PostItem from './Post';
 import { Post, PostGroup } from 'retro-board-common';
 import useUser from '../../auth/useUser';
 import Group from './Group';
+import {
+  Droppable,
+  DroppableProvided,
+  DroppableStateSnapshot,
+} from 'react-beautiful-dnd';
+import { ColumnContent } from './types';
 
 interface ColumnProps {
+  column: ColumnContent;
   posts: Post[];
   groups: PostGroup[];
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>> | null;
@@ -28,6 +35,7 @@ const useStyles = makeStyles({
 });
 
 const Column: SFC<ColumnProps> = ({
+  column,
   posts,
   groups,
   icon: Icon,
@@ -83,44 +91,65 @@ const Column: SFC<ColumnProps> = ({
           <Group key={group.id} group={group} />
         ))}
       </Groups>
-      <div>
-        {posts.map(post => (
-          <PostItem
-            key={post.id}
-            post={post}
-            color={color}
-            onLike={() => onLike(post)}
-            onDislike={() => onDislike(post)}
-            onDelete={() => onDelete(post)}
-            onEdit={content =>
-              onEdit({
-                ...post,
-                content,
-              })
-            }
-            onEditAction={action =>
-              onEdit({
-                ...post,
-                action,
-              })
-            }
-            onEditGiphy={giphy =>
-              onEdit({
-                ...post,
-                giphy,
-              })
-            }
-          />
-        ))}
-      </div>
+      <Droppable droppableId={'col' + column.index} type="column">
+        {(
+          dropProvided: DroppableProvided,
+          dropSnapshot: DroppableStateSnapshot
+        ) => (
+          <PostsWrapper
+            ref={dropProvided.innerRef}
+            {...dropProvided.droppableProps}
+            draggingOver={dropSnapshot.isDraggingOver}
+          >
+            {posts.map((post, index) => (
+              <PostItem
+                index={index}
+                key={post.id}
+                post={post}
+                color={color}
+                onLike={() => onLike(post)}
+                onDislike={() => onDislike(post)}
+                onDelete={() => onDelete(post)}
+                onEdit={content =>
+                  onEdit({
+                    ...post,
+                    content,
+                  })
+                }
+                onEditAction={action =>
+                  onEdit({
+                    ...post,
+                    action,
+                  })
+                }
+                onEditGiphy={giphy =>
+                  onEdit({
+                    ...post,
+                    giphy,
+                  })
+                }
+              />
+            ))}
+          </PostsWrapper>
+        )}
+      </Droppable>
     </ColumnWrapper>
   );
 };
 
 const ColumnWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
   margin-bottom: 10px;
   padding: 0 5px;
+  outline: 1px solid red;
+`;
+
+const PostsWrapper = styled.div<{ draggingOver: boolean }>`
+  background-color: ${props => (props.draggingOver ? 'red' : 'unset')};
+  outline: 1px solid blue;
+  flex: 1;
 `;
 
 const Groups = styled.div``;

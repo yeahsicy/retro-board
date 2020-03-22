@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { Post } from 'retro-board-common';
 import { Typography, makeStyles, Box } from '@material-ui/core';
+import {
+  DragDropContext,
+  DropResult,
+  ResponderProvided,
+} from 'react-beautiful-dnd';
 import useTranslations from '../../translations';
 import useGlobalState from '../../state';
 import useRemainingVotes from './useRemainingVotes';
@@ -49,6 +54,13 @@ function GameMode({
   const user = useUser();
   const isLoggedIn = !!user;
 
+  const handleOnDragEnd = useCallback(
+    (result: DropResult, provided: ResponderProvided) => {
+      console.log('Drag end', result, provided);
+    },
+    []
+  );
+
   if (!state.session) {
     return <span>Loading...</span>;
   }
@@ -82,24 +94,27 @@ function GameMode({
           <RemainingVotes up={remainingVotes.up} down={remainingVotes.down} />
         </HeaderWrapper>
 
-        <Columns numberOfColumns={columns.length}>
-          {columns.map(column => (
-            <Column
-              key={column.index}
-              posts={column.posts}
-              groups={column.groups}
-              question={column.label}
-              icon={getIcon(column.icon)}
-              color={column.color}
-              onAdd={content => onAddPost(column.index, content)}
-              onAddGroup={() => onAddGroup(column.index)}
-              onDelete={onDeletePost}
-              onLike={post => onLike(post, true)}
-              onDislike={post => onLike(post, false)}
-              onEdit={onEdit}
-            />
-          ))}
-        </Columns>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <Columns numberOfColumns={columns.length}>
+            {columns.map(column => (
+              <Column
+                column={column}
+                key={column.index}
+                posts={column.posts}
+                groups={column.groups}
+                question={column.label}
+                icon={getIcon(column.icon)}
+                color={column.color}
+                onAdd={content => onAddPost(column.index, content)}
+                onAddGroup={() => onAddGroup(column.index)}
+                onDelete={onDeletePost}
+                onLike={post => onLike(post, true)}
+                onDislike={post => onLike(post, false)}
+                onEdit={onEdit}
+              />
+            ))}
+          </Columns>
+        </DragDropContext>
       </Box>
     </Page>
   );

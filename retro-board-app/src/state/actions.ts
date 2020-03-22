@@ -7,6 +7,7 @@ export const RENAME_SESSION = 'retrospected/game/session/rename';
 export const RESET_SESSION = 'retrospected/game/session/reset';
 export const RECEIVE_POST = 'retrospected/game/post/receive';
 export const RECEIVE_POST_GROUP = 'retrospected/game/group/receive';
+// export const RECEIVE_MOVE_POST = 'retrospected/game/post/move';
 export const RECEIVE_VOTE = 'retrospected/game/post/vote/receive';
 export const DELETE_POST = 'retrospected/game/post/delete';
 export const UPDATE_POST = 'retrospected/game/post/update';
@@ -58,4 +59,8 @@ export const receiveVote = (dispatch: Dispatch) => (
 
 export const deletePost = (dispatch: Dispatch) => (post: Post) => {
   dispatch(createAction(DELETE_POST, post));
+};
+
+export const movePost = (dispatch: Dispatch) => (post: Post) => {
+  dispatch(createAction(RECEIVE_MOVE_POST, post));
 };
