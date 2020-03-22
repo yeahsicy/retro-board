@@ -117,6 +117,13 @@ const useGame = (sessionId: string) => {
       receivePost(post);
     });
 
+    newSocket.on(Actions.RECEIVE_POST_GROUP, (group: PostGroup) => {
+      if (debug) {
+        console.log('Receive new post group: ', group);
+      }
+      receivePostGroup(group);
+    });
+
     newSocket.on(Actions.RECEIVE_BOARD, (posts: Post[]) => {
       if (debug) {
         console.log('Receive entire board: ', posts);
@@ -138,6 +145,13 @@ const useGame = (sessionId: string) => {
       deletePost(post);
     });
 
+    newSocket.on(Actions.RECEIVE_DELETE_POST_GROUP, (group: PostGroup) => {
+      if (debug) {
+        console.log('Delete post group: ', group);
+      }
+      deletePostGroup(group);
+    });
+
     newSocket.on(
       Actions.RECEIVE_LIKE,
       ({ postId, vote }: { postId: string; vote: Vote }) => {
@@ -153,6 +167,13 @@ const useGame = (sessionId: string) => {
         console.log('Receive edit post: ', post.post);
       }
       updatePost(post.post);
+    });
+
+    newSocket.on(Actions.RECEIVE_EDIT_POST_GROUP, (group: PostGroup) => {
+      if (debug) {
+        console.log('Receive edit group: ', group);
+      }
+      updatePostGroup(group);
     });
 
     newSocket.on(Actions.RECEIVE_SESSION_NAME, (name: string) => {
@@ -179,6 +200,11 @@ const useGame = (sessionId: string) => {
     setPlayers,
     deletePost,
     updatePost,
+
+    receivePostGroup,
+    deletePostGroup,
+    updatePostGroup,
+
     renameSession,
     disconnected,
   ]);

@@ -91,6 +91,14 @@ export default (state: State, action: Action): State => {
         session: {
           ...state.session,
           groups: state.session.groups.filter(g => g.id !== action.payload.id),
+          posts: state.session.posts.map(p =>
+            p.group && p.group.id === action.payload.id
+              ? {
+                  ...p,
+                  group: null,
+                }
+              : p
+          ),
         },
       };
     case UPDATE_POST:

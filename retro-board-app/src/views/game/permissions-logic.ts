@@ -71,6 +71,7 @@ export function numberOfVotes(
   userId: string | number,
   session: Session
 ) {
+  console.log('Session: ', session);
   return session.posts.reduce<number>((prev, cur) => {
     return (
       prev +
