@@ -89,7 +89,7 @@ const Column: SFC<ColumnProps> = ({
         </Button>
         {groups.map(group => (
           <Group key={group.id} group={group}>
-            {posts.map((post, index) => (
+            {group.posts.map((post, index) => (
               <PostItem
                 index={index}
                 key={post.id}
@@ -130,6 +130,7 @@ const Column: SFC<ColumnProps> = ({
             ref={dropProvided.innerRef}
             {...dropProvided.droppableProps}
             draggingOver={dropSnapshot.isDraggingOver}
+            draggingColor={column.color}
           >
             {posts.map((post, index) => (
               <PostItem
@@ -173,12 +174,14 @@ const ColumnWrapper = styled.div`
   flex: 1;
   margin-bottom: 10px;
   padding: 0 5px;
-  outline: 1px solid red;
 `;
 
-const PostsWrapper = styled.div<{ draggingOver: boolean }>`
-  background-color: ${props => (props.draggingOver ? 'red' : 'unset')};
-  outline: 1px solid blue;
+const PostsWrapper = styled.div<{
+  draggingOver: boolean;
+  draggingColor: string;
+}>`
+  background-color: ${props =>
+    props.draggingOver ? props.draggingColor : 'unset'};
   flex: 1;
 `;
 

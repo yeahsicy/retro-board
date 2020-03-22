@@ -306,6 +306,7 @@ export default (store: Store, io: SocketIO.Server) => {
       post.action = data.post.action;
       post.giphy = data.post.giphy;
       post.column = data.post.column;
+      post.group = data.post.group;
       persistPost(userId, session.id, post);
       sendToAll(socket, session.id, RECEIVE_EDIT_POST, data);
     }

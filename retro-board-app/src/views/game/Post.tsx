@@ -4,7 +4,6 @@ import {
   Button,
   Typography,
   makeStyles,
-  Tooltip,
   Popover,
   Card,
   CardActions,
@@ -19,18 +18,20 @@ import {
   Feedback,
   Close,
   EmojiEmotions,
+  DragIndicator,
 } from '@material-ui/icons';
+import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import useTranslations from '../../translations';
 import EditableLabel from '../../components/EditableLabel';
 import { Palette } from '../../Theme';
 import { Post } from 'retro-board-common';
 import { useUserPermissions } from './useUserPermissions';
-import { countVotes, enumerateVotes, VoteEnumeration } from './utils';
+import { countVotes, enumerateVotes } from './utils';
 import GiphySearchBox from 'react-giphy-searchbox';
 import useGiphy from '../../hooks/useGiphy';
 import config from '../../utils/getConfig';
 import useToggle from '../../hooks/useToggle';
-import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
+import VoteButton from './VoteButton';
 
 interface PostItemProps {
   index: number;
@@ -104,10 +105,9 @@ const PostItem = ({
       <Draggable draggableId={post.id} index={index}>
         {(provided: DraggableProvided) => (
           <PostCard ref={provided.innerRef} {...provided.draggableProps}>
-            <div
-              style={{ width: 30, height: 30, backgroundColor: 'red' }}
-              {...provided.dragHandleProps}
-            />
+            <DragHandle {...provided.dragHandleProps}>
+              <DragIndicator />
+            </DragHandle>
             <CardContent>
               <Typography variant="body1">
                 <EditableLabel
@@ -256,65 +256,24 @@ const PostItem = ({
   );
 };
 
-interface VoteButtonProps {
-  voters: VoteEnumeration[];
-  showTooltip: boolean;
-  canVote: boolean;
-  count: number;
-  icon: JSX.Element;
-  ariaLabel: string;
-  onClick: () => void;
-}
-
-const VoteButton = ({
-  voters,
-  showTooltip,
-  canVote,
-  count,
-  icon,
-  onClick,
-  ariaLabel,
-}: VoteButtonProps) => {
-  const show = showTooltip && voters.length;
-  return (
-    <Tooltip
-      placement="bottom"
-      disableHoverListener={!show}
-      disableFocusListener={!show}
-      disableTouchListener={!show}
-      title={
-        show ? (
-          <div>
-            {voters.map((voter, i) => (
-              <p key={i}>
-                {voter.name}
-                {voter.count > 1 ? ` (x${voter.count})` : ''}
-              </p>
-            ))}
-          </div>
-        ) : (
-          ''
-        )
-      }
-    >
-      <span>
-        <Button
-          onClick={onClick}
-          disabled={!canVote}
-          aria-label={ariaLabel}
-          tabIndex={-1}
-        >
-          {icon}
-          &nbsp;{count}
-        </Button>
-      </span>
-    </Tooltip>
-  );
-};
+const DragHandle = styled.div`
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  visibility: hidden;
+  color: grey;
+`;
 
 const PostCard = styled(Card)`
   margin: 10px 5px;
   margin-bottom: 20px;
+  position: relative;
+
+  :hover {
+    ${DragHandle} {
+      visibility: visible;
+    }
+  }
 `;
 
 const AuthorContainer = styled.div`

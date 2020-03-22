@@ -5,7 +5,6 @@ import {
   SET_PLAYERS,
   RECEIVE_POST,
   RECEIVE_POST_GROUP,
-  // RECEIVE_MOVE_POST,
   DELETE_POST,
   UPDATE_POST,
   RECEIVE_BOARD,
@@ -42,16 +41,6 @@ export default (state: State, action: Action): State => {
           groups: [...state.session.groups, action.payload],
         },
       };
-    // case RECEIVE_MOVE_POST:
-    //   if (!state.session) {
-    //     return state;
-    //   }
-    //   return {
-    //     ...state,
-    //     session: {
-
-    //     }
-    //   };
     case RECEIVE_VOTE:
       if (!state.session) {
         return state;

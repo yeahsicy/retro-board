@@ -32,7 +32,6 @@ const useGame = (sessionId: string) => {
     setPlayers,
     deletePost,
     updatePost,
-    movePost,
     receiveVote,
     renameSession,
     resetSession,
@@ -246,6 +245,7 @@ const useGame = (sessionId: string) => {
         const updatedPost: Post = {
           ...post,
           column: destinationColumn,
+          group: destinationGroup,
         };
         updatePost(updatedPost);
         send(Actions.EDIT_POST, {
