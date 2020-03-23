@@ -46,7 +46,11 @@ export interface SessionOptions {
   allowAuthorVisible: boolean;
 }
 
-export interface Post {
+export interface Rankable {
+  rank: string;
+}
+
+export interface Post extends Rankable {
   id: string;
   column: number;
   content: string;
@@ -57,7 +61,7 @@ export interface Post {
   votes: Vote[];
 }
 
-export interface PostGroup {
+export interface PostGroup extends Rankable {
   id: string;
   label: string;
   column: number;

@@ -30,6 +30,7 @@
     "date-fns": "^2.9.0",
     "flag-icon-css": "3.4.6",
     "http-proxy-middleware": "^0.21.0",
+    "lexorank": "^1.0.4",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "prop-types": "^15.7.2",

@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Actions, Post, PostGroup, Vote, VoteType } from 'retro-board-common';
 import { v4 } from 'uuid';
 import { find } from 'lodash';
+import { LexoRank } from 'lexorank';
 import { trackAction, trackEvent } from './../../track';
 import io from 'socket.io-client';
 import useGlobalState from '../../state';
 import useUser from '../../auth/useUser';
+import { getMiddle, getNext } from './lexorank';
 
 const debug = process.env.NODE_ENV === 'development';
 
@@ -211,7 +213,7 @@ const useGame = (sessionId: string) => {
 
   // Callbacks
   const onAddPost = useCallback(
-    (columnIndex: number, content: string) => {
+    (columnIndex: number, content: string, rank: string) => {
       if (send) {
         const post: Post = {
           content,
@@ -222,6 +224,7 @@ const useGame = (sessionId: string) => {
           column: columnIndex,
           user: user!,
           group: null,
+          rank,
         };
 
         receivePost(post);
@@ -233,7 +236,7 @@ const useGame = (sessionId: string) => {
   );
 
   const onAddGroup = useCallback(
-    (columnIndex: number) => {
+    (columnIndex: number, rank: string) => {
       if (send) {
         const group: PostGroup = {
           id: v4(),
@@ -241,6 +244,7 @@ const useGame = (sessionId: string) => {
           column: columnIndex,
           user: user!,
           posts: [],
+          rank,
         };
 
         receivePostGroup(group);
@@ -278,13 +282,14 @@ const useGame = (sessionId: string) => {
       post: Post,
       destinationGroup: PostGroup | null,
       destinationColumn: number,
-      destinationIndex: number
+      newRank: string
     ) => {
       if (send) {
         const updatedPost: Post = {
           ...post,
           column: destinationColumn,
           group: destinationGroup,
+          rank: newRank,
         };
         updatePost(updatedPost);
         send(Actions.EDIT_POST, {
@@ -306,6 +311,7 @@ const useGame = (sessionId: string) => {
           column: post2.column,
           user: user!,
           posts: [],
+          rank: getMiddle(),
         };
 
         receivePostGroup(group);
@@ -316,6 +322,7 @@ const useGame = (sessionId: string) => {
           ...post1,
           column: destinationColumn,
           group: group,
+          rank: getMiddle(),
         };
         updatePost(updatedPost1);
         send(Actions.EDIT_POST, {
@@ -326,6 +333,7 @@ const useGame = (sessionId: string) => {
           ...post2,
           column: destinationColumn,
           group: group,
+          rank: getNext(getMiddle()),
         };
         updatePost(updatedPost2);
         send(Actions.EDIT_POST, {

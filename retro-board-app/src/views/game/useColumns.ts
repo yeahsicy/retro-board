@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { sortBy } from 'lodash';
 import useTranslations from '../../translations';
 import useGlobalState from '../../state';
 import { ColumnContent } from '../game/types';
@@ -20,13 +21,17 @@ export default function useColumns() {
           (col, index) =>
             ({
               index,
-              posts: posts.filter(p => p.column === index && p.group === null),
+              posts: sortBy(
+                posts.filter(p => p.column === index && p.group === null),
+                p => p.rank
+              ),
               groups: groups
                 .filter(p => p.column === index)
                 .map(group => ({
                   ...group,
-                  posts: posts.filter(
-                    p => !!p.group && p.group.id === group.id
+                  posts: sortBy(
+                    posts.filter(p => !!p.group && p.group.id === group.id),
+                    p => p.rank
                   ),
                 })),
               ...col,

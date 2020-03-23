@@ -339,6 +339,7 @@ export default (store: Store, io: SocketIO.Server) => {
       post.giphy = data.post.giphy;
       post.column = data.post.column;
       post.group = data.post.group;
+      post.rank = data.post.rank;
       persistPost(userId, session.id, post);
       sendToAll(socket, session.id, RECEIVE_EDIT_POST, data);
     }
@@ -357,6 +358,7 @@ export default (store: Store, io: SocketIO.Server) => {
     if (group) {
       group.column = data.column;
       group.label = data.label;
+      group.rank = data.rank;
       persistPostGroup(userId, session.id, group);
       sendToAll(socket, session.id, RECEIVE_EDIT_POST_GROUP, data);
     }

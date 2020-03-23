@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
+import { LexoRank } from 'lexorank';
 import Session from './Session';
 import User from './User';
 import Vote from './Vote';
@@ -28,6 +30,9 @@ export default class Post {
   public group: PostGroup | null;
   @Column({ default: 0 })
   public column: number;
+  @Index()
+  @Column({ default: LexoRank.middle().toString() })
+  public rank: string;
   @Column()
   public content: string;
   @Column({ nullable: true, type: 'character varying' })
@@ -65,5 +70,6 @@ export default class Post {
     this.action = null;
     this.giphy = null;
     this.group = null;
+    this.rank = LexoRank.middle().toString();
   }
 }

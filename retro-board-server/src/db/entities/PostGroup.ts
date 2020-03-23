@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
+import { LexoRank } from 'lexorank';
 import Session from './Session';
 import User from './User';
 import Post from './Post';
@@ -19,6 +21,9 @@ export default class PostGroup {
   public session: Session;
   @Column({ default: 0 })
   public column: number;
+  @Index()
+  @Column({ default: LexoRank.middle().toString() })
+  public rank: string;
   @Column()
   public label: string;
   @ManyToOne(() => User, { eager: true, cascade: true, nullable: false })
@@ -49,5 +54,6 @@ export default class PostGroup {
     this.column = column;
     this.label = label;
     this.user = user;
+    this.rank = LexoRank.middle().toString();
   }
 }

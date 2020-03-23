@@ -18,18 +18,23 @@ import { ColumnContent } from './types';
 import RemainingVotes from './RemainingVotes';
 import useUser from '../../auth/useUser';
 import { Alert } from '@material-ui/lab';
-import { getMovingEntities, getCombiningEntities } from './moving-logic';
+import {
+  getMovingEntities,
+  getCombiningEntities,
+  calculateRank,
+} from './moving-logic';
+import { getNext, getMiddle } from './lexorank';
 
 interface GameModeProps {
   columns: ColumnContent[];
   onRenameSession: (name: string) => void;
-  onAddPost: (columnIndex: number, content: string) => void;
-  onAddGroup: (columnIndex: number) => void;
+  onAddPost: (columnIndex: number, content: string, rank: string) => void;
+  onAddGroup: (columnIndex: number, rank: string) => void;
   onMovePost: (
     post: Post,
     destinationGroup: PostGroup | null,
     destinationColumn: number,
-    destinationIndex: number
+    newRank: string
   ) => void;
   onCombinePost: (post1: Post, post2: Post) => void;
   onDeletePost: (post: Post) => void;
@@ -47,6 +52,20 @@ const useStyles = makeStyles({
     marginTop: 20,
   },
 });
+
+const calculateRankForNewPost = (column: ColumnContent): string => {
+  if (column.posts.length) {
+    return getNext(column.posts[column.posts.length - 1].rank);
+  }
+  return getMiddle();
+};
+
+const calculateRankForNewGroup = (column: ColumnContent): string => {
+  if (column.groups.length) {
+    return getNext(column.groups[column.groups.length - 1].rank);
+  }
+  return getMiddle();
+};
 
 function GameMode({
   onRenameSession,
@@ -71,6 +90,12 @@ function GameMode({
   const handleOnDragEnd = useCallback(
     (result: DropResult, provided: ResponderProvided) => {
       console.log('Drag end', result, provided);
+      console.log(
+        'From',
+        result.source.index,
+        'to',
+        result?.destination?.index
+      );
 
       if (!!result.destination) {
         const entities = getMovingEntities(
@@ -81,11 +106,12 @@ function GameMode({
         );
         if (entities) {
           console.log('Corretly found entities: ', entities);
+          const newRank = calculateRank(entities.previous, entities.next);
           onMovePost(
             entities.post,
             entities.targetGroup,
             entities.targetColumn,
-            entities.targetIndex
+            newRank
           );
         }
       }
@@ -148,8 +174,16 @@ function GameMode({
                 question={column.label}
                 icon={getIcon(column.icon)}
                 color={column.color}
-                onAdd={content => onAddPost(column.index, content)}
-                onAddGroup={() => onAddGroup(column.index)}
+                onAdd={content =>
+                  onAddPost(
+                    column.index,
+                    content,
+                    calculateRankForNewPost(column)
+                  )
+                }
+                onAddGroup={() =>
+                  onAddGroup(column.index, calculateRankForNewGroup(column))
+                }
                 onDelete={onDeletePost}
                 onLike={post => onLike(post, true)}
                 onDislike={post => onLike(post, false)}

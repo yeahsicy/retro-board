@@ -1,9 +1,12 @@
 import { ColumnContent } from './types';
 import { Post, PostGroup } from 'retro-board-common';
 import { flattenDeep } from 'lodash';
+import { getMiddle, getPrevious, getNext, getBetween } from './lexorank';
 
 interface MovingEntities {
   post: Post;
+  previous?: Post;
+  next?: Post;
   targetGroup: PostGroup | null;
   targetColumn: number;
   targetIndex: number;
@@ -12,6 +15,22 @@ interface MovingEntities {
 interface CombiningEntities {
   post1: Post;
   post2: Post;
+}
+
+export function calculateRank(previous?: Post, next?: Post): string {
+  if (!previous && !next) {
+    return getMiddle();
+  }
+  if (!previous && next) {
+    return getPrevious(next.rank);
+  }
+  if (previous && !next) {
+    return getNext(previous.rank);
+  }
+  if (previous && next) {
+    return getBetween(previous.rank, next.rank);
+  }
+  throw Error('This should not be possible');
 }
 
 export function getCombiningEntities(
@@ -42,8 +61,15 @@ export function getMovingEntities(
     const targetGroup = findGroup(columns, id);
     const targetColumn = findColumIndexForGroup(columns, id);
     if (targetGroup) {
+      const postsWithoutSource = targetGroup.posts.filter(p => p !== post);
       return {
         post,
+        previous:
+          targetIndex !== 0 ? postsWithoutSource[targetIndex - 1] : undefined,
+        next:
+          targetIndex !== postsWithoutSource.length
+            ? postsWithoutSource[targetIndex]
+            : undefined,
         targetGroup,
         targetColumn,
         targetIndex,
@@ -52,8 +78,16 @@ export function getMovingEntities(
   }
   if (post && type === 'column') {
     const targetColumn = +id;
+    const column = columns[targetColumn];
+    const postsWithoutSource = column.posts.filter(p => p !== post);
     return {
       post,
+      previous:
+        targetIndex !== 0 ? postsWithoutSource[targetIndex - 1] : undefined,
+      next:
+        targetIndex !== postsWithoutSource.length
+          ? postsWithoutSource[targetIndex]
+          : undefined,
       targetGroup: null,
       targetColumn,
       targetIndex,
