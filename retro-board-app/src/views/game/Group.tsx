@@ -6,7 +6,7 @@ import {
   DroppableProvided,
   DroppableStateSnapshot,
 } from 'react-beautiful-dnd';
-import { colors, Button } from '@material-ui/core';
+import { colors, Button, IconButton } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import EditableLabel from '../../components/EditableLabel';
 
@@ -35,18 +35,24 @@ const Group: React.FC<GroupProps> = ({
           {...dropProvided.droppableProps}
           draggingOver={dropSnapshot.isDraggingOver}
         >
-          <DeleteContainer>
-            <Button endIcon={<Delete />} onClick={() => onDelete(group)} />
-          </DeleteContainer>
-          <Label>
-            <EditableLabel
-              value={group.label}
-              onChange={onEditLabel}
-              readOnly={readonly}
-            />
-          </Label>
-          <div>{children}</div>
-          {group.posts.length === 0 ? <NoPosts>(empty)</NoPosts> : null}
+          <Header>
+            <Label>
+              <EditableLabel
+                value={group.label}
+                onChange={onEditLabel}
+                readOnly={readonly}
+              />
+            </Label>
+            <DeleteContainer>
+              <IconButton onClick={() => onDelete(group)}>
+                <Delete />
+              </IconButton>
+            </DeleteContainer>
+          </Header>
+          <Content>
+            <div>{children}</div>
+            {group.posts.length === 0 ? <NoPosts>(empty)</NoPosts> : null}
+          </Content>
         </GroupContainer>
       )}
     </Droppable>
@@ -57,23 +63,34 @@ const GroupContainer = styled.div<{ draggingOver: boolean }>`
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 20px 2px;
-  border: 2px dashed lightgray;
+  border: 1px dashed lightgray;
   border-radius: 10px;
   margin: 20px 0;
   background-color: ${props =>
-    props.draggingOver ? colors.grey[100] : 'unset'};
+    props.draggingOver ? colors.grey[200] : 'unset'};
 `;
 
-const Label = styled.div``;
-
-const DeleteContainer = styled.div`
-  position: absolute;
-  top: 3px;
-  right: 3px;
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: ${colors.grey[100]};
+  padding: 10px;
 `;
+
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Label = styled.div`
+  margin-left: 30px;
+  flex: 1;
+`;
+
+const DeleteContainer = styled.div``;
 
 const NoPosts = styled.div`
+  justify-self: center;
   color: grey;
   text-align: center;
   font-weight: 2em;
