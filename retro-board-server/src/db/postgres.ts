@@ -27,6 +27,7 @@ import {
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
 import shortId from 'shortid';
+import { v4 } from 'uuid';
 import { SessionTemplate, Session } from './entities';
 
 export async function getDb() {
@@ -52,7 +53,12 @@ const create = (
           id,
           options: { ...template.options },
           columns: template.columns!.map(
-            c => ({ ...c, author: { id: author.id } } as JsonColumnDefintion)
+            c =>
+              ({
+                ...c,
+                id: v4(),
+                author: { id: author.id },
+              } as JsonColumnDefintion)
           ),
         },
         author.id
@@ -62,6 +68,10 @@ const create = (
       const newSession = await sessionRepository.saveFromJson(
         {
           ...defaultSession,
+          columns: defaultSession.columns.map(c => ({
+            ...c,
+            id: v4(),
+          })),
           id,
         },
         author.id

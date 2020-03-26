@@ -1,7 +1,14 @@
 import React, { SFC, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Input, InputAdornment, Button, makeStyles } from '@material-ui/core';
-import { Add as AddIcon } from '@material-ui/icons';
+import {
+  Input,
+  InputAdornment,
+  Button,
+  makeStyles,
+  IconButton,
+  Tooltip,
+} from '@material-ui/core';
+import { Add as AddIcon, CreateNewFolder } from '@material-ui/icons';
 import PostItem from './Post';
 import { Post, PostGroup } from 'retro-board-common';
 import useUser from '../../auth/useUser';
@@ -86,11 +93,15 @@ const Column: SFC<ColumnProps> = ({
             ) : null
           }
         />
+        <AddGroup>
+          <Tooltip title="Create a group to group posts together">
+            <IconButton onClick={onAddGroup}>
+              <CreateNewFolder />
+            </IconButton>
+          </Tooltip>
+        </AddGroup>
       </Add>
       <Groups>
-        <Button onClick={onAddGroup} endIcon={<AddIcon />}>
-          Add a group
-        </Button>
         {groups.map(group => (
           <Group
             key={group.id}
@@ -204,14 +215,21 @@ const PostsWrapper = styled.div<{
 const Groups = styled.div``;
 
 const Add = styled.div`
+  display: flex;
   margin-bottom: 20px;
 
-  > div {
-    width: 100%;
+  > :first-child {
+    flex: 1;
+    // width: 100%;
   }
   input {
     width: 100%;
   }
+`;
+
+const AddGroup = styled.div`
+  position: relative;
+  top: 5px;
 `;
 
 export default Column;

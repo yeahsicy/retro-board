@@ -51,7 +51,9 @@ const Group: React.FC<GroupProps> = ({
           </Header>
           <Content>
             <div>{children}</div>
-            {group.posts.length === 0 ? <NoPosts>(empty)</NoPosts> : null}
+            {group.posts.length === 0 ? (
+              <NoPosts>Drag a Post here</NoPosts>
+            ) : null}
           </Content>
         </GroupContainer>
       )}
@@ -65,7 +67,7 @@ const GroupContainer = styled.div<{ draggingOver: boolean }>`
   flex-direction: column;
   border: 1px dashed lightgray;
   border-radius: 10px;
-  margin: 20px 0;
+  margin: 10px 0;
   background-color: ${props =>
     props.draggingOver ? colors.grey[200] : 'unset'};
 `;
@@ -80,6 +82,7 @@ const Header = styled.div`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 100px;
 `;
 
 const Label = styled.div`
