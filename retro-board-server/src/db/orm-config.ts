@@ -32,7 +32,7 @@ export default function(): ConnectionOptions {
       TemplateColumnDefinition,
     ],
     synchronize: false,
-    logging: !config.SQL_LOG ? 'all' : undefined,
+    logging: config.SQL_LOG ? 'all' : undefined,
     migrations: [`${migrationsDirectory}/*.ts`],
     cli: {
       migrationsDir: migrationsDirectory,
