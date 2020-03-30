@@ -12,17 +12,16 @@ import {
   ListItemText,
   ListItemIcon,
   Avatar,
+  colors,
 } from '@material-ui/core';
 import { Feedback } from '@material-ui/icons';
 import { ColumnContent } from '../types';
 import { Palette } from '../../../Theme';
 import useTranslations from '../../../translations';
-import { Post, PostGroup } from 'retro-board-common';
-import { countVotes, sortPostByVote } from '../utils';
 import { Page } from '../../../components/Page';
 import SpeedDial from './SpeedDial';
 import { calculateSummary } from './calculate-summary';
-import { ColumnStats, ColumnStatsItem } from './types';
+import { ColumnStats, ColumnStatsItem, ActionItem } from './types';
 
 interface SummaryModeProps {
   columns: ColumnContent[];
@@ -45,9 +44,6 @@ const Section = ({ stats }: SectionProps) => (
           style={{ backgroundColor: stats.column.color }}
         />
         <CardContent>
-          {/* {column.groups.map(g => (
-            <GroupSummary key={g.id} group={g} />
-          ))} */}
           {stats.items.length ? (
             <PostsList items={stats.items} />
           ) : (
@@ -79,13 +75,17 @@ const GroupSummary = ({ group }: GroupSummaryProps) => {
 };
 
 const GroupContainer = styled.div`
+  border-left: 1px dashed ${colors.grey[500]};
+  margin-left: -10px;
+  padding-left: 10px;
   > :nth-child(2) {
-    margin-left: 5px;
+    margin-left: 15px;
   }
 `;
 const GroupTitle = styled.div`
   display: flex;
   font-weight: bold;
+  opacity: 0.4;
 `;
 
 interface PostsListProps {
@@ -93,11 +93,8 @@ interface PostsListProps {
 }
 
 const PostsList = ({ items }: PostsListProps) => {
-  // const sortedList = useMemo(() => {
-  //   return [...posts].sort(sortPostByVote);
-  // }, [posts]);
   return (
-    <>
+    <div>
       {items.map(item =>
         item.type === 'post' ? (
           <PostLine item={item} key={item.id} />
@@ -105,7 +102,7 @@ const PostsList = ({ items }: PostsListProps) => {
           <GroupSummary group={item} key={item.id} />
         )
       )}
-    </>
+    </div>
   );
 };
 
@@ -148,71 +145,70 @@ const PostContent = styled.span`
   flex: 1;
 `;
 
-// const ActionsList = ({ items: posts }: PostsListProps) => {
-//   const theme = useTheme();
-//   const {
-//     Actions: { summaryTitle },
-//   } = useTranslations();
-//   return (
-//     <Grid
-//       container
-//       spacing={4}
-//       component="section"
-//       role="list"
-//       style={{ marginTop: 30 }}
-//     >
-//       <Grid item xs={12}>
-//         <Card>
-//           <CardHeader
-//             title={
-//               <Typography variant="h6" style={{ fontWeight: 300 }}>
-//                 {summaryTitle}
-//               </Typography>
-//             }
-//             style={{
-//               backgroundColor: theme.palette.primary.main,
-//               color: theme.palette.primary.contrastText,
-//             }}
-//           />
-//           <CardContent>
-//             <List>
-//               {posts.map(post => (
-//                 <ListItem key={post.id}>
-//                   <ListItemIcon>
-//                     <Avatar>
-//                       <Feedback />
-//                     </Avatar>
-//                   </ListItemIcon>
-//                   <ListItemText
-//                     primary={post.action}
-//                     secondary={post.content}
-//                   />
-//                 </ListItem>
-//               ))}
-//             </List>
-//           </CardContent>
-//         </Card>
-//       </Grid>
-//     </Grid>
-//   );
-// };
+interface ActionsListProps {
+  actions: ActionItem[];
+}
+
+const ActionsList = ({ actions }: ActionsListProps) => {
+  const theme = useTheme();
+  const {
+    Actions: { summaryTitle },
+  } = useTranslations();
+  return (
+    <Grid
+      container
+      spacing={4}
+      component="section"
+      role="list"
+      style={{ marginTop: 30 }}
+    >
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            title={
+              <Typography variant="h6" style={{ fontWeight: 300 }}>
+                {summaryTitle}
+              </Typography>
+            }
+            style={{
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+            }}
+          />
+          <CardContent>
+            <List>
+              {actions.map(action => (
+                <ListItem key={action.postId}>
+                  <ListItemIcon>
+                    <Avatar>
+                      <Feedback />
+                    </Avatar>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={action.action}
+                    secondary={action.postContent}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+};
 
 const SummaryMode: React.SFC<SummaryModeProps> = ({ columns }) => {
-  // const posts = useMemo(() => {
-  //   return columns.reduce<Post[]>((prev, current) => {
-  //     return [...prev, ...current.posts.filter(post => !!post.action)];
-  //   }, []);
-  // }, [columns]);
   const stats = useMemo(() => {
     return calculateSummary(columns);
   }, [columns]);
   return (
     <Page>
       <div>
-        {stats.map(stat => (
+        {stats.columns.map(stat => (
           <Section key={stat.column.index} stats={stat} />
         ))}
-        {/* {posts.length ? <ActionsList posts={posts} /> : null} */}
+        {stats.actions.length ? <ActionsList actions={stats.actions} /> : null}
       </div>
       <SpeedDialContainer>
         <SpeedDial />

@@ -1,16 +1,21 @@
 import { Post, PostGroup } from 'retro-board-common';
-import { sortBy } from 'lodash';
+import { sortBy, flattenDeep } from 'lodash';
 import { ColumnContent } from '../types';
-import { ColumnStats, ColumnStatsItem } from './types';
+import { ColumnStats, ColumnStatsItem, Stats, ActionItem } from './types';
 import { countVotes, countVotesForGroup } from '../utils';
 
-export function calculateSummary(columns: ColumnContent[]): ColumnStats[] {
-  return columns.map(calculateColumn);
+export function calculateSummary(columns: ColumnContent[]): Stats {
+  return {
+    columns: columns.map(calculateColumn),
+    actions: buildActions(columns),
+  };
 }
 
 function calculateColumn(column: ColumnContent): ColumnStats {
   const posts: ColumnStatsItem[] = column.posts.map(postToItem);
-  const groups: ColumnStatsItem[] = column.groups.map(groupToItem);
+  const groups: ColumnStatsItem[] = column.groups
+    .filter(g => !!g.posts.length)
+    .map(groupToItem);
   return { items: sortBy([...posts, ...groups], sortingFunction), column };
 }
 
@@ -34,6 +39,23 @@ function groupToItem(group: PostGroup): ColumnStatsItem {
     likes: countVotesForGroup(group, 'like'),
     dislikes: countVotesForGroup(group, 'dislike'),
   };
+}
+
+function buildActions(columns: ColumnContent[]): ActionItem[] {
+  return getAllPosts(columns).map(p => ({
+    action: p.action!,
+    postContent: p.content,
+    postId: p.id,
+  }));
+}
+
+function getAllPosts(columns: ColumnContent[]): Post[] {
+  return [
+    ...flattenDeep(columns.map(c => c.posts.filter(p => !!p.action))),
+    ...flattenDeep(
+      columns.map(c => c.groups.map(g => g.posts.filter(p => !!p.action)))
+    ),
+  ];
 }
 
 function sortingFunction(item: ColumnStatsItem) {
