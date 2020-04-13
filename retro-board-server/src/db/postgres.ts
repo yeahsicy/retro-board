@@ -255,19 +255,31 @@ const getOrSaveUser = (userRepository: UserRepository) => async (
 const previousSessions = (sessionRepository: SessionRepository) => async (
   userId: string
 ): Promise<JsonSessionMetadata[]> => {
-  const sessions = await sessionRepository
-    .createQueryBuilder('session')
-    .printSql()
-    .leftJoinAndSelect('session.createdBy', 'createdBy')
-    .leftJoinAndSelect('session.posts', 'posts')
-    .leftJoinAndSelect('posts.user', 'postAuthor')
-    .leftJoinAndSelect('posts.votes', 'votes')
-    .leftJoinAndSelect('votes.user', 'voteAuthor')
-    .where('session.createdBy.id = :id', { id: userId })
-    .orWhere('posts.user.id = :id', { id: userId })
-    .orWhere('votes.user.id = :id', { id: userId })
-    .orderBy('session.created', 'DESC')
-    .getMany();
+  const ids: number[] = await sessionRepository.query(
+    `
+  (
+		select distinct id from sessions where "createdById" = $1
+	)
+	union
+	(
+		select distinct sessions.id from sessions 
+		left join posts on sessions.id = posts."sessionId"
+		where posts."userId" = $1
+	)
+	union
+	(
+		select distinct sessions.id from sessions 
+		left join posts on sessions.id = posts."sessionId"
+		left join votes on posts.id = votes."userId"
+		where votes."userId" = $1
+	)
+  `,
+    [userId]
+  );
+
+  const sessions = await sessionRepository.findByIds(ids, {
+    relations: ['posts', 'posts.votes'],
+  });
 
   return sessions.map(
     (session) =>
