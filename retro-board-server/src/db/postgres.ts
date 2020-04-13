@@ -279,6 +279,7 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
 
   const sessions = await sessionRepository.findByIds(ids, {
     relations: ['posts', 'posts.votes'],
+    order: { created: 'DESC' },
   });
 
   return sessions.map(
