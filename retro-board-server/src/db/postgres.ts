@@ -20,9 +20,7 @@ import {
   SessionMetadata as JsonSessionMetadata,
   SessionOptions,
   defaultSession,
-  defaultOptions,
   VoteType,
-  PostGroup,
 } from 'retro-board-common';
 import { Store } from '../types';
 import getOrmConfig from './orm-config';
@@ -53,7 +51,7 @@ const create = (
           id,
           options: { ...template.options },
           columns: template.columns!.map(
-            c =>
+            (c) =>
               ({
                 ...c,
                 id: v4(),
@@ -68,7 +66,7 @@ const create = (
       const newSession = await sessionRepository.saveFromJson(
         {
           ...defaultSession,
-          columns: defaultSession.columns.map(c => ({
+          columns: defaultSession.columns.map((c) => ({
             ...c,
             id: v4(),
           })),
@@ -272,7 +270,7 @@ const previousSessions = (sessionRepository: SessionRepository) => async (
     .getMany();
 
   return sessions.map(
-    session =>
+    (session) =>
       ({
         created: session.created,
         createdBy: session.createdBy,
@@ -291,21 +289,21 @@ function getParticipans(session: Session) {
   return uniqBy(
     [
       session.createdBy,
-      ...session.posts!.map(p => p.user),
-      ...flattenDeep(session.posts!.map(p => p.votes!.map(v => v.user))),
+      ...session.posts!.map((p) => p.user),
+      ...flattenDeep(session.posts!.map((p) => p.votes!.map((v) => v.user))),
     ].filter(Boolean),
-    u => u.id
+    (u) => u.id
   );
 }
 
 function numberOfVotes(type: VoteType, session: Session) {
   return session.posts!.reduce<number>((prev, cur) => {
-    return prev + cur.votes!.filter(v => v.type === type).length;
+    return prev + cur.votes!.filter((v) => v.type === type).length;
   }, 0);
 }
 
 function numberOfActions(session: Session) {
-  return session.posts!.filter(p => p.action !== null).length;
+  return session.posts!.filter((p) => p.action !== null).length;
 }
 
 export default async function db(): Promise<Store> {
