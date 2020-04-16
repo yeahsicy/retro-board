@@ -28,6 +28,7 @@ import useTranslations from '../translations';
 import UserContext from './Context';
 import { anonymousLogin } from '../api';
 import styled from 'styled-components';
+import config from '../utils/getConfig';
 
 const API_URL = '/api/auth';
 
@@ -40,6 +41,10 @@ const Login = ({ onClose }: LoginModalProps) => {
   const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
   const windowRef = useRef<Window | null>(null);
   const { setUser } = useContext(UserContext);
+  const hasNoSocialMediaAuth =
+    !config.GoogleAuthEnabled &&
+    !config.TwitterAuthEnabled &&
+    !config.GitHubAuthEnabled;
 
   useEffect(() => {
     const s = io();
@@ -117,23 +122,39 @@ const Login = ({ onClose }: LoginModalProps) => {
       aria-labelledby="responsive-dialog-title"
     >
       <DialogContent>
-        <Card>
-          <CardHeader title="Account Login" />
-          <CardContent>
-            <Alert severity="info">
-              This will use your account to authenticate you, and will allow you
-              to retrieve all your sessions. No password is stored.
-            </Alert>
-            <AccountsButtons>
-              <GithubLoginButton onClick={handleGitHub} />
-              <GoogleLoginButton onClick={handleGoogle} />
-              <TwitterLoginButton onClick={handleTwitter} />
-            </AccountsButtons>
-          </CardContent>
-        </Card>
-        <Typography variant="h4" style={{ textAlign: 'center', margin: 20 }}>
-          or
-        </Typography>
+        {!hasNoSocialMediaAuth ? (
+          <>
+            <Card>
+              <CardHeader title="Account Login" />
+              <CardContent>
+                <Alert severity="info">
+                  This will use your account to authenticate you, and will allow
+                  you to retrieve all your sessions. No password is stored.
+                </Alert>
+                <AccountsButtons>
+                  {config.GitHubAuthEnabled && (
+                    <GithubLoginButton
+                      onClick={handleGitHub}
+                      text="Authenticating with GitHub"
+                    />
+                  )}
+                  {config.GoogleAuthEnabled && (
+                    <GoogleLoginButton onClick={handleGoogle} />
+                  )}
+                  {config.TwitterAuthEnabled && (
+                    <TwitterLoginButton onClick={handleTwitter} />
+                  )}
+                </AccountsButtons>
+              </CardContent>
+            </Card>
+            <Typography
+              variant="h4"
+              style={{ textAlign: 'center', margin: 20 }}
+            >
+              or
+            </Typography>
+          </>
+        ) : null}
         <Card>
           <CardHeader title="Anonymous Login" />
           <CardContent>
