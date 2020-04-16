@@ -37,7 +37,7 @@ interface LoginModalProps {
 }
 
 const Login = ({ onClose }: LoginModalProps) => {
-  const translations = useTranslations();
+  const { Login: loginTranslations } = useTranslations();
   const [socket, setSocket] = useState<SocketIOClient.Socket | null>(null);
   const windowRef = useRef<Window | null>(null);
   const { setUser } = useContext(UserContext);
@@ -125,24 +125,29 @@ const Login = ({ onClose }: LoginModalProps) => {
         {!hasNoSocialMediaAuth ? (
           <>
             <Card>
-              <CardHeader title="Account Login" />
+              <CardHeader title={loginTranslations.socialMediaAuthHeader} />
               <CardContent>
                 <Alert severity="info">
-                  This will use your account to authenticate you, and will allow
-                  you to retrieve all your sessions. No password is stored.
+                  {loginTranslations.socialMediaAuthDescription}
                 </Alert>
                 <AccountsButtons>
                   {config.GitHubAuthEnabled && (
                     <GithubLoginButton
                       onClick={handleGitHub}
-                      text="Authenticating with GitHub"
+                      text={loginTranslations.authenticatingWith + ' GitHub'}
                     />
                   )}
                   {config.GoogleAuthEnabled && (
-                    <GoogleLoginButton onClick={handleGoogle} />
+                    <GoogleLoginButton
+                      onClick={handleGoogle}
+                      text={loginTranslations.authenticatingWith + ' Google'}
+                    />
                   )}
                   {config.TwitterAuthEnabled && (
-                    <TwitterLoginButton onClick={handleTwitter} />
+                    <TwitterLoginButton
+                      onClick={handleTwitter}
+                      text={loginTranslations.authenticatingWith + ' Twitter'}
+                    />
                   )}
                 </AccountsButtons>
               </CardContent>
@@ -151,22 +156,21 @@ const Login = ({ onClose }: LoginModalProps) => {
               variant="h4"
               style={{ textAlign: 'center', margin: 20 }}
             >
-              or
+              {loginTranslations.or}
             </Typography>
           </>
         ) : null}
         <Card>
-          <CardHeader title="Anonymous Login" />
+          <CardHeader title={loginTranslations.anonymousAuthHeader} />
           <CardContent>
             <Alert severity="info">
-              This will create an anonymous account, but won't allow you to
-              retrieve past sessions.
+              {loginTranslations.anonymousAuthDescription}
             </Alert>
             <Input
               value={username}
               onChange={handleUsernameChange}
-              title={translations.Login.buttonLabel}
-              placeholder={translations.Login.namePlaceholder}
+              title={loginTranslations.buttonLabel}
+              placeholder={loginTranslations.namePlaceholder}
               fullWidth
               style={{ marginTop: 20 }}
             />
@@ -177,7 +181,7 @@ const Login = ({ onClose }: LoginModalProps) => {
                 autoFocus
                 disabled={!username.trim().length}
               >
-                {translations.Login.buttonLabel}
+                {loginTranslations.buttonLabel}
               </Button>
             </CardActions>
           </CardContent>
