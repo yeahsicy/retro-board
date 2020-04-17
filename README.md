@@ -1,3 +1,5 @@
+For testing purpose, I forked the original repo and deploy it to Azure Linux web app via Deployment center > GitHub option. 
+
 # retro-board
 
 [![Build Status](https://travis-ci.org/antoinejaussoin/retro-board.svg?branch=develop)](https://travis-ci.org/antoinejaussoin/retro-board)
